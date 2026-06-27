@@ -7,8 +7,9 @@ import '../widgets/custom_text_field.dart';
 import '../widgets/primary_button.dart';
 
 import '../utils/validators.dart';
-
+import 'register_screen.dart';
 import 'main_layout.dart';
+import '../services/popup_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -61,12 +62,13 @@ class _LoginScreenState
       isLoading = true;
     });
 
-    bool success =
-        await AuthService.login(
+    final result =
+    await AuthService.login(
 
       emailController.text.trim(),
 
       passwordController.text,
+
     );
 
     if (!mounted) return;
@@ -75,31 +77,37 @@ class _LoginScreenState
       isLoading = false;
     });
 
-    if (success) {
+    if (result["success"] == true) {
 
-      Navigator.pushReplacement(
+      await PopupService.success(
 
-        context,
+  context,
 
-        MaterialPageRoute(
+  "Login Successful",
 
-          builder: (_) =>
-              const MainLayout(),
-        ),
-      );
+);
+
+Navigator.pushReplacement(
+
+  context,
+
+  MaterialPageRoute(
+
+    builder: (_) => const MainLayout(),
+
+  ),
+
+);
 
     } else {
 
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
+      await PopupService.error(
 
-        const SnackBar(
+  context,
 
-          content: Text(
-            "Invalid Email or Password",
-          ),
-        ),
-      );
+  result["message"],
+
+);
     }
   }
 
@@ -196,17 +204,29 @@ class _LoginScreenState
 
                 TextButton(
 
-                  onPressed: () {
+  onPressed: () {
 
-                    // TODO
+    Navigator.push(
 
-                    // Register Screen
-                  },
+      context,
 
-                  child: const Text(
-                    "Create New Account",
-                  ),
-                ),
+      MaterialPageRoute(
+
+        builder: (_) =>
+            const RegisterScreen(),
+
+      ),
+
+    );
+
+  },
+
+  child: const Text(
+
+    "Create New Account",
+
+  ),
+),
 
                 const Divider(
                   height: 40,

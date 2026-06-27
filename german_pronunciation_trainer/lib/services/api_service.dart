@@ -14,32 +14,65 @@ class ApiService {
   // Login
   //------------------------------------------------
 
-  static Future<Map<String, dynamic>>
-      login(
-    String email,
-    String password,
-  ) async {
+  static Future<Map<String, dynamic>> login(
+  String email,
+  String password,
+) async {
 
-    final response = await http.post(
+  final response = await http.post(
 
-      Uri.parse("$baseUrl/auth/login"),
+    Uri.parse("$baseUrl/auth/login"),
 
-      headers: {
+    headers: {
+      "Content-Type": "application/json",
+    },
 
-        "Content-Type":
-            "application/json",
-      },
+    body: jsonEncode({
+      "email": email,
+      "password": password,
+    }),
+  );
 
-      body: jsonEncode({
+  print("Login Status : ${response.statusCode}");
+  print("Login Body   : ${response.body}");
 
-        "email": email,
+  return jsonDecode(response.body);
+}
 
-        "password": password,
-      }),
-    );
+  //------------------------------------------------
+// Register
+//------------------------------------------------
 
-    return jsonDecode(response.body);
-  }
+static Future<Map<String, dynamic>> register(
+  String name,
+  String email,
+  String password,
+) async {
+
+  final response = await http.post(
+
+    Uri.parse("$baseUrl/auth/register"),
+
+    headers: {
+      "Content-Type": "application/json",
+    },
+
+    body: jsonEncode({
+
+      "name": name,
+
+      "email": email,
+
+      "password": password,
+
+    }),
+  );
+
+  print("Register Status : ${response.statusCode}");
+  print("Register Body   : ${response.body}");
+
+  return jsonDecode(response.body);
+}
 
   //------------------------------------------------
   // Random Word

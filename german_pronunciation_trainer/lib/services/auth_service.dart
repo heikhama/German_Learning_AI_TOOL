@@ -3,55 +3,124 @@ import 'storage_service.dart';
 
 class AuthService {
 
-  /// Login User
-  static Future<bool> login(
-      String email,
-      String password) async {
+  //------------------------------------------------
+  // Register
+  //------------------------------------------------
+
+  static Future<Map<String, dynamic>> register(
+    String name,
+    String email,
+    String password,
+  ) async {
 
     try {
 
-      final result =
-          await ApiService.login(
+      final result = await ApiService.register(
+        name,
         email,
         password,
       );
 
-      // Verify JWT exists
-      if (result.containsKey("access_token")) {
+      if (result.containsKey("success")) {
 
-        await StorageService.saveToken(
-          result["access_token"],
-        );
+        return {
+          "success": result["success"],
+          "message": result["message"],
+        };
 
-        return true;
       }
 
-      return false;
+      return {
+        "success": false,
+        "message": result["detail"] ??
+            "Registration Failed",
+      };
 
     } catch (e) {
 
-      print("Login Error : $e");
+      return {
+        "success": false,
+        "message": e.toString(),
+      };
 
-      return false;
     }
+
   }
 
-  /// Logout User
+  //------------------------------------------------
+  // Login
+  //------------------------------------------------
+
+  static Future<Map<String, dynamic>> login(
+    String email,
+    String password,
+  ) async {
+
+    try {
+
+      final result = await ApiService.login(
+        email,
+        password,
+      );
+
+      if (result["success"] == true) {
+
+        await StorageService.saveToken(
+          result["data"]["access_token"],
+        );
+
+        return {
+          "success": true,
+          "message": result["message"],
+        };
+
+      }
+
+      return {
+        "success": false,
+        "message": result["detail"] ??
+            "Invalid Email or Password",
+      };
+
+    } catch (e) {
+
+      return {
+        "success": false,
+        "message": e.toString(),
+      };
+
+    }
+
+  }
+
+  //------------------------------------------------
+  // Logout
+  //------------------------------------------------
+
   static Future<void> logout() async {
 
     await StorageService.logout();
+
   }
 
-  /// Check Login Status
+  //------------------------------------------------
+  // Login Status
+  //------------------------------------------------
+
   static Future<bool> isLoggedIn() async {
 
-    return await StorageService.isLoggedIn();
+    return StorageService.isLoggedIn();
+
   }
 
-  /// Get JWT Token
+  //------------------------------------------------
+  // Get Token
+  //------------------------------------------------
+
   static Future<String?> getToken() async {
 
-    return await StorageService.getToken();
+    return StorageService.getToken();
+
   }
 
 }
