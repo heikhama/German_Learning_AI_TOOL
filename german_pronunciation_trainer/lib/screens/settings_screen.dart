@@ -217,11 +217,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
             title: "Learning Preferences",
 
-            // subtitle: user == null
-            //     ? ""
-            //     : "${user!.learningLanguage} • "
-            //           "${user!.learningCategory} • "
-            //           "${user!.learningLevel}",
+            subtitle: user == null
+                ? ""
+                : "${user!.learningLanguage} • "
+                      "${user!.learningCategory} • "
+                      "${user!.learningLevel}",
 
             onTap: () async {
               final updated = await Navigator.push(

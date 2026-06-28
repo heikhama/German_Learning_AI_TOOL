@@ -35,6 +35,13 @@ class _HomeScreenState extends State<HomeScreen> {
     loadWord();
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    loadProfile();
+  }
+
   Future<void> loadWord() async {
     final word = await ApiService.getRandomWord();
 
@@ -85,7 +92,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
           const SizedBox(height: 20),
 
-          const BannerCard(),
+          BannerCard(user: user),
 
           const SizedBox(height: 25),
 
