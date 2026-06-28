@@ -1,8 +1,8 @@
-"""create_words_table
+"""add avatar
 
-Revision ID: 12d935a580a3
-Revises: 2a5a922467ea
-Create Date: 2026-06-21 19:53:39.079551
+Revision ID: 2a4eecb97b8d
+Revises: e10a0226301b
+Create Date: 2026-06-28 01:02:12.849364
 
 """
 from typing import Sequence, Union
@@ -12,8 +12,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '12d935a580a3'
-down_revision: Union[str, Sequence[str], None] = '2a5a922467ea'
+revision: str = '2a4eecb97b8d'
+down_revision: Union[str, Sequence[str], None] = 'e10a0226301b'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 

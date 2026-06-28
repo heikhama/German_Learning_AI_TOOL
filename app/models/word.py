@@ -15,10 +15,10 @@ class Word(Base):
 
     __tablename__ = "words"
 
-    id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True),
+    id: Mapped[int] = mapped_column(
+        Integer,
         primary_key=True,
-        default=uuid.uuid4
+        autoincrement=True,
     )
 
     german_word: Mapped[str] = mapped_column(

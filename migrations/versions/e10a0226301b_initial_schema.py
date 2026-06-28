@@ -1,8 +1,8 @@
-"""create_users_table
+"""initial schema
 
-Revision ID: 2a5a922467ea
+Revision ID: e10a0226301b
 Revises: 
-Create Date: 2026-06-16 08:21:10.361540
+Create Date: 2026-06-28 01:01:22.816132
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '2a5a922467ea'
+revision: str = 'e10a0226301b'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -33,16 +33,17 @@ def upgrade() -> None:
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('users',
-    sa.Column('id', sa.UUID(), nullable=False),
+    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('name', sa.String(length=100), nullable=False),
     sa.Column('email', sa.String(length=255), nullable=False),
     sa.Column('password_hash', sa.String(length=255), nullable=False),
     sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+    sa.Column('avatar_url', sa.String(), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_users_email'), 'users', ['email'], unique=True)
     op.create_table('words',
-    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('german_word', sa.String(length=255), nullable=False),
     sa.Column('english_meaning', sa.String(length=255), nullable=False),
     sa.Column('level', sa.Integer(), nullable=False),

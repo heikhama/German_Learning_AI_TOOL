@@ -1,9 +1,9 @@
 import uuid
 
-from sqlalchemy import String
+from sqlalchemy import String, Column
 from sqlalchemy import DateTime
 from sqlalchemy import func
-
+from sqlalchemy import Integer
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 
@@ -16,10 +16,10 @@ class User(Base):
 
     __tablename__ = "users"
 
-    id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True),
+    id: Mapped[int] = mapped_column(
+        Integer,
         primary_key=True,
-        default=uuid.uuid4
+        autoincrement=True,
     )
 
     name: Mapped[str] = mapped_column(
@@ -39,4 +39,9 @@ class User(Base):
     created_at: Mapped[DateTime] = mapped_column(
         DateTime(timezone=True),
         server_default=func.now()
+    )
+    avatar_url = Column(
+        String,
+        nullable=False,
+        default="",
     )
