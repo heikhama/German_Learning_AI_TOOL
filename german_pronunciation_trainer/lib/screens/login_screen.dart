@@ -15,33 +15,23 @@ class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() =>
-      _LoginScreenState();
+  State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState
-    extends State<LoginScreen> {
-
+class _LoginScreenState extends State<LoginScreen> {
   //------------------------------------------------------
   // Form Key
   //------------------------------------------------------
 
-  final _formKey =
-      GlobalKey<FormState>();
+  final _formKey = GlobalKey<FormState>();
 
   //------------------------------------------------------
   // Debug Login
   //------------------------------------------------------
 
-  final emailController =
-      TextEditingController(
-    text: "hydrogen@test.com",
-  );
+  final emailController = TextEditingController(text: "hydrogen@test.com");
 
-  final passwordController =
-      TextEditingController(
-    text: "123456",
-  );
+  final passwordController = TextEditingController(text: "123456");
 
   //------------------------------------------------------
 
@@ -50,11 +40,9 @@ class _LoginScreenState
   //------------------------------------------------------
 
   Future<void> login() async {
-
     FocusScope.of(context).unfocus();
 
-    if (!_formKey.currentState!
-        .validate()) {
+    if (!_formKey.currentState!.validate()) {
       return;
     }
 
@@ -62,13 +50,10 @@ class _LoginScreenState
       isLoading = true;
     });
 
-    final result =
-    await AuthService.login(
-
+    final result = await AuthService.login(
       emailController.text.trim(),
 
       passwordController.text,
-
     );
 
     if (!mounted) return;
@@ -78,36 +63,15 @@ class _LoginScreenState
     });
 
     if (result["success"] == true) {
+      await PopupService.success(context, "Login Successful");
 
-      await PopupService.success(
+      Navigator.pushReplacement(
+        context,
 
-  context,
-
-  "Login Successful",
-
-);
-
-Navigator.pushReplacement(
-
-  context,
-
-  MaterialPageRoute(
-
-    builder: (_) => const MainLayout(),
-
-  ),
-
-);
-
+        MaterialPageRoute(builder: (_) => const MainLayout()),
+      );
     } else {
-
-      await PopupService.error(
-
-  context,
-
-  result["message"],
-
-);
+      await PopupService.error(context, result["message"]);
     }
   }
 
@@ -115,65 +79,40 @@ Navigator.pushReplacement(
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-
-      appBar: AppBar(
-
-        title: const Text(
-          "German AI Trainer",
-        ),
-      ),
+      appBar: AppBar(title: const Text("German AI Trainer")),
 
       body: Center(
-
         child: SingleChildScrollView(
-
-          padding:
-              const EdgeInsets.all(25),
+          padding: const EdgeInsets.all(25),
 
           child: Form(
-
             key: _formKey,
 
             child: Column(
-
-              crossAxisAlignment:
-                  CrossAxisAlignment.stretch,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
 
               children: [
-
                 const AppLogo(),
 
-                const SizedBox(
-                  height: 40,
-                ),
+                const SizedBox(height: 40),
 
                 CustomTextField(
-
-                  controller:
-                      emailController,
+                  controller: emailController,
 
                   label: "Email",
 
                   icon: Icons.email,
 
-                  keyboardType:
-                      TextInputType
-                          .emailAddress,
+                  keyboardType: TextInputType.emailAddress,
 
-                  validator:
-                      Validators.email,
+                  validator: Validators.email,
                 ),
 
-                const SizedBox(
-                  height: 20,
-                ),
+                const SizedBox(height: 20),
 
                 CustomTextField(
-
-                  controller:
-                      passwordController,
+                  controller: passwordController,
 
                   label: "Password",
 
@@ -181,16 +120,12 @@ Navigator.pushReplacement(
 
                   obscureText: true,
 
-                  validator:
-                      Validators.password,
+                  validator: Validators.password,
                 ),
 
-                const SizedBox(
-                  height: 30,
-                ),
+                const SizedBox(height: 30),
 
                 PrimaryButton(
-
                   text: "LOGIN",
 
                   loading: isLoading,
@@ -198,60 +133,34 @@ Navigator.pushReplacement(
                   onPressed: login,
                 ),
 
-                const SizedBox(
-                  height: 15,
-                ),
+                const SizedBox(height: 15),
 
                 TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
 
-  onPressed: () {
+                      MaterialPageRoute(builder: (_) => const RegisterScreen()),
+                    );
+                  },
 
-    Navigator.push(
-
-      context,
-
-      MaterialPageRoute(
-
-        builder: (_) =>
-            const RegisterScreen(),
-
-      ),
-
-    );
-
-  },
-
-  child: const Text(
-
-    "Create New Account",
-
-  ),
-),
-
-                const Divider(
-                  height: 40,
+                  child: const Text("Create New Account"),
                 ),
 
+                const Divider(height: 40),
+
                 ElevatedButton.icon(
-
                   onPressed: () {
+                    emailController.text = "hydrogen@test.com";
 
-                    emailController.text =
-                        "hydrogen@test.com";
-
-                    passwordController
-                        .text = "123456";
+                    passwordController.text = "123456";
 
                     login();
                   },
 
-                  icon: const Icon(
-                    Icons.bug_report,
-                  ),
+                  icon: const Icon(Icons.bug_report),
 
-                  label: const Text(
-                    "Developer Login",
-                  ),
+                  label: const Text("Developer Login"),
                 ),
               ],
             ),
@@ -265,7 +174,6 @@ Navigator.pushReplacement(
 
   @override
   void dispose() {
-
     emailController.dispose();
 
     passwordController.dispose();

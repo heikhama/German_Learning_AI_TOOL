@@ -14,7 +14,12 @@ class StorageService {
   static Future<String?> getToken() async {
     final prefs = await SharedPreferences.getInstance();
 
-    return prefs.getString(tokenKey);
+    // return prefs.getString(tokenKey);
+    final token = prefs.getString(tokenKey);
+
+    // print("Stored Token = $token");
+
+    return token;
   }
 
   /// Delete JWT Token

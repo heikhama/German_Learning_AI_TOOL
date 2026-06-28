@@ -3,8 +3,16 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.auth import router as auth_router
 from app.api.words import router as words_router
 from app.routes.user_router import router as user_router
+from fastapi.staticfiles import StaticFiles
+
 app = FastAPI(
     title="German AI Server"
+)
+
+app.mount(
+    "/uploads",
+    StaticFiles(directory="uploads"),
+    name="uploads",
 )
 
 app.add_middleware(

@@ -1,79 +1,54 @@
 import 'package:flutter/material.dart';
 
-import '../core/app_images.dart';
 import '../core/app_text.dart';
+import '../models/user_model.dart';
+import '../services/api_service.dart';
 
 class DashboardHeader extends StatelessWidget {
-  const DashboardHeader({super.key});
+  final UserModel? user;
+
+  const DashboardHeader({
+    super.key,
+    required this.user,
+  });
 
   @override
   Widget build(BuildContext context) {
-
     return Row(
-
       children: [
-
         Expanded(
-
           child: Column(
-
-            crossAxisAlignment:
-                CrossAxisAlignment.start,
-
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
               Text(
-
-                "Hello Hydrogen 👋",
-
+                "Hello ${user?.name ?? "Guest"} 👋",
                 style: AppText.heading,
-
               ),
 
               const SizedBox(height: 6),
 
               Text(
-
                 "Learn German with Artificial Intelligence",
-
                 style: AppText.subtitle,
-
               ),
-
             ],
-
           ),
-
         ),
 
         CircleAvatar(
-
-          radius: 32,
-
-          backgroundColor: Colors.white,
-
-          child: ClipOval(
-
-            child: Image.asset(
-
-              AppImages.avatar,
-
-              width: 60,
-
-              height: 60,
-
-              fit: BoxFit.cover,
-
-            ),
-
-          ),
-
+          radius: 25,
+          backgroundColor: Colors.grey.shade200,
+          backgroundImage:
+              user == null || user!.avatar.isEmpty
+                  ? const AssetImage(
+                      "assets/images/avatar.png",
+                    ) as ImageProvider
+                  : NetworkImage(
+                      "${ApiService.baseUrl}${user!.avatar}"
+                      "?t=${DateTime.now().millisecondsSinceEpoch}",
+                    ),
         ),
-
       ],
-
     );
-
   }
-
 }

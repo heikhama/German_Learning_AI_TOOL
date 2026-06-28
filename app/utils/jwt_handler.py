@@ -52,6 +52,8 @@ def create_access_token(data: dict):
 # Decode JWT
 # ----------------------------------------------------------
 
+from jose import jwt, JWTError, ExpiredSignatureError
+
 def decode_access_token(token: str):
 
     try:
@@ -62,9 +64,25 @@ def decode_access_token(token: str):
             algorithms=[ALGORITHM],
         )
 
+        # print("Decoded Payload:", payload)
+
         return payload
 
-    except JWTError:
+    except ExpiredSignatureError as e:
+
+        print("Token Expired:", e)
+
+        return None
+
+    except JWTError as e:
+
+        print("JWT Error:", e)
+
+        return None
+
+    except Exception as e:
+
+        print("Unexpected Error:", e)
 
         return None
 
@@ -74,51 +92,37 @@ def decode_access_token(token: str):
 # ----------------------------------------------------------
 
 def get_current_user(
-
     token: str = Depends(oauth2_scheme),
-
     db: Session = Depends(get_db),
-
 ):
+
+    # print("=" * 60)
+    # print("Received Token:", token)
 
     payload = decode_access_token(token)
 
+    # print("Payload:", payload)
+
     if payload is None:
-
         raise HTTPException(
-
-            status_code=status.HTTP_401_UNAUTHORIZED,
-
+            status_code=401,
             detail="Invalid or expired token",
-
         )
 
     user_id = payload.get("sub")
 
-    if user_id is None:
-
-        raise HTTPException(
-
-            status_code=status.HTTP_401_UNAUTHORIZED,
-
-            detail="Invalid token",
-
-        )
+    # print("User ID:", user_id)
 
     user = db.query(User).filter(
-
         User.id == int(user_id)
-
     ).first()
 
+    # print("Database User:", user)
+
     if user is None:
-
         raise HTTPException(
-
-            status_code=status.HTTP_401_UNAUTHORIZED,
-
+            status_code=401,
             detail="User not found",
-
         )
 
     return user
