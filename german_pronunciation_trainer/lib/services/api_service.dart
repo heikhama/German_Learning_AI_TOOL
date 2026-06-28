@@ -187,23 +187,87 @@ class ApiService {
   static Future<Word> getRandomWord() async {
     final response = await http.get(Uri.parse("$baseUrl/words/random"));
 
+    print("==================================");
+    print("GET RANDOM WORD");
+    print("Status Code: ${response.statusCode}");
+    print("Response:");
+    print(response.body);
+    print("==================================");
+
     if (response.statusCode != 200) {
       throw Exception("Failed to load word");
     }
 
     final Map<String, dynamic> json = jsonDecode(response.body);
 
-    // If backend returns:
-    // {
-    //   "success": true,
-    //   "data": {...}
-    // }
-
     if (json.containsKey("data")) {
       return Word.fromJson(json["data"]);
     }
 
-    // If backend returns the word object directly
     return Word.fromJson(json);
+  }
+
+  //---------------------------------------------------------
+  // Get Learning Preferences
+  //---------------------------------------------------------
+
+  static Future<Map<String, dynamic>> getPreferences({
+    required String token,
+  }) async {
+    final response = await http.get(
+      Uri.parse("$baseUrl/user/preferences"),
+
+      headers: {"Authorization": "Bearer $token"},
+    );
+
+    print("======================================");
+    print("GET PREFERENCES");
+    print(response.body);
+    print("======================================");
+
+    return jsonDecode(response.body);
+  }
+
+  //---------------------------------------------------------
+  // Update Learning Preferences
+  //---------------------------------------------------------
+
+  static Future<Map<String, dynamic>> updatePreferences({
+    required String token,
+
+    required String language,
+
+    required String category,
+
+    required String level,
+
+    required int wordsPerSession,
+  }) async {
+    final response = await http.put(
+      Uri.parse("$baseUrl/user/preferences"),
+
+      headers: {
+        "Authorization": "Bearer $token",
+
+        "Content-Type": "application/json",
+      },
+
+      body: jsonEncode({
+        "learning_language": language,
+
+        "learning_category": category,
+
+        "learning_level": level,
+
+        "words_per_session": wordsPerSession,
+      }),
+    );
+
+    print("======================================");
+    print("UPDATE PREFERENCES");
+    print(response.body);
+    print("======================================");
+
+    return jsonDecode(response.body);
   }
 }

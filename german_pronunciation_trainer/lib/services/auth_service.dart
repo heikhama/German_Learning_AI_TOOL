@@ -232,4 +232,58 @@ class AuthService {
       return {"success": false, "message": e.toString()};
     }
   }
+
+  //---------------------------------------------------------
+  // Get Learning Preferences
+  //---------------------------------------------------------
+
+  static Future<Map<String, dynamic>> getPreferences() async {
+    try {
+      final token = await StorageService.getToken();
+
+      if (token == null) {
+        return {"success": false, "message": "Please login again"};
+      }
+
+      return await ApiService.getPreferences(token: token);
+    } catch (e) {
+      return {"success": false, "message": e.toString()};
+    }
+  }
+
+  //---------------------------------------------------------
+  // Update Learning Preferences
+  //---------------------------------------------------------
+
+  static Future<Map<String, dynamic>> updatePreferences({
+    required String language,
+
+    required String category,
+
+    required String level,
+
+    required int wordsPerSession,
+  }) async {
+    try {
+      final token = await StorageService.getToken();
+
+      if (token == null) {
+        return {"success": false, "message": "Please login again"};
+      }
+
+      return await ApiService.updatePreferences(
+        token: token,
+
+        language: language,
+
+        category: category,
+
+        level: level,
+
+        wordsPerSession: wordsPerSession,
+      );
+    } catch (e) {
+      return {"success": false, "message": e.toString()};
+    }
+  }
 }

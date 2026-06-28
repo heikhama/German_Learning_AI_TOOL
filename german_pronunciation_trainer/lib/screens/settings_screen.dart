@@ -12,9 +12,10 @@ import 'settings/change_email_screen.dart';
 import 'settings/change_password_screen.dart';
 import 'settings/avatar_screen.dart';
 import 'settings/about_screen.dart';
-import 'settings/language_screen.dart';
+// import 'settings/language_screen.dart';
 import 'settings/theme_screen.dart';
 import 'settings/privacy_policy_screen.dart';
+import 'settings/learning_preferences_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -95,7 +96,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  
+
                   child: Column(
                     children: [
                       CircleAvatar(
@@ -212,18 +213,31 @@ class _SettingsScreenState extends State<SettingsScreen> {
           // Preferences
           //--------------------------------------------------
           SettingsTile(
-            icon: Icons.language,
+            icon: Icons.school,
 
-            title: "Language",
+            title: "Learning Preferences",
 
-            onTap: () {
-              Navigator.push(
+            // subtitle: user == null
+            //     ? ""
+            //     : "${user!.learningLanguage} • "
+            //           "${user!.learningCategory} • "
+            //           "${user!.learningLevel}",
+
+            onTap: () async {
+              final updated = await Navigator.push(
                 context,
 
-                MaterialPageRoute(builder: (_) => const LanguageScreen()),
+                MaterialPageRoute(
+                  builder: (_) => const LearningPreferencesScreen(),
+                ),
               );
+
+              if (updated == true) {
+                await loadProfile();
+              }
             },
           ),
+          const SizedBox(height: 20),
 
           SettingsTile(
             icon: Icons.dark_mode,

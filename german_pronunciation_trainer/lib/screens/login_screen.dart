@@ -63,7 +63,7 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     if (result["success"] == true) {
-      await PopupService.success(context, "Login Successful");
+      // await PopupService.success(context, "Login Successful");
 
       Navigator.pushReplacement(
         context,
