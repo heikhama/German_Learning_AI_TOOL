@@ -15,6 +15,8 @@ from app.routes.user_router import router as user_router
 from app.routes.language_router import router as language_router
 from app.routes.master_router import router as master_router
 
+from app.routes import vocabulary_router
+
 from app.routes.download_router import (
     router as download_router,
 )
@@ -48,6 +50,9 @@ app.include_router(language_router)
 app.include_router(master_router)
 app.include_router(download_router)
 app.include_router(download_status_router)
+app.include_router(
+    vocabulary_router.router
+)
 
 @app.get("/")
 def root():

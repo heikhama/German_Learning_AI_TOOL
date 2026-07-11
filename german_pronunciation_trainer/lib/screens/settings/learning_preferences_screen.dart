@@ -16,6 +16,7 @@ import '../../widgets/language_dropdown.dart';
 import '../../models/download_progress.dart';
 import '../../controllers/download_controller.dart';
 import '../../widgets/download_progress_dialog.dart';
+
 class LearningPreferencesScreen extends StatefulWidget {
   const LearningPreferencesScreen({super.key});
 
@@ -24,9 +25,7 @@ class LearningPreferencesScreen extends StatefulWidget {
       _LearningPreferencesScreenState();
 }
 
-class _LearningPreferencesScreenState
-    extends State<LearningPreferencesScreen> {
-
+class _LearningPreferencesScreenState extends State<LearningPreferencesScreen> {
   //------------------------------------------------------
   // Loading
   //------------------------------------------------------
@@ -40,8 +39,7 @@ class _LearningPreferencesScreenState
   // DownloadController controller = DownloadController();
 
   // DownloadProgress? progress;
-  final ValueNotifier<DownloadProgress?> progressNotifier =
-    ValueNotifier(null);
+  final ValueNotifier<DownloadProgress?> progressNotifier = ValueNotifier(null);
 
   //------------------------------------------------------
   // Master Data
@@ -65,37 +63,26 @@ class _LearningPreferencesScreenState
 
   int wordsPerSession = 20;
 
-  final List<int> sessionList = [
-    5,
-    10,
-    20,
-    30,
-    50,
-    100,
-  ];
+  final List<int> sessionList = [5, 10, 20, 30, 50, 100];
 
   //------------------------------------------------------
 
   @override
   void initState() {
-
     super.initState();
 
     controller = DownloadController();
 
     loadData();
-
   }
 
   @override
   void dispose() {
-
     controller.dispose();
 
     progressNotifier.dispose();
 
     super.dispose();
-
   }
 
   //------------------------------------------------------
@@ -103,484 +90,310 @@ class _LearningPreferencesScreenState
   //------------------------------------------------------
 
   Future<void> loadData() async {
+    if (!mounted) return;
 
-  if (!mounted) return;
+    setState(() {
+      loading = true;
+    });
 
-  setState(() {
-    loading = true;
-  });
+    try {
+      //--------------------------------------------------
+      // Languages
+      //--------------------------------------------------
 
-  try {
+      print("=================================");
+      print("Loading Languages");
+      print("=================================");
 
-    //--------------------------------------------------
-    // Languages
-    //--------------------------------------------------
+      final languageList = await MasterService.getLanguages();
 
-    print("=================================");
-    print("Loading Languages");
-    print("=================================");
+      print(languageList);
 
-    final languageList =
-        await MasterService.getLanguages();
+      languages = languageList;
 
-    print(languageList);
+      //--------------------------------------------------
+      // Categories
+      //--------------------------------------------------
 
-    languages = languageList;
+      print("=================================");
+      print("Loading Categories");
+      print("=================================");
 
-    //--------------------------------------------------
-    // Categories
-    //--------------------------------------------------
+      final categoryList = await MasterService.getCategories();
 
-    print("=================================");
-    print("Loading Categories");
-    print("=================================");
+      print(categoryList);
 
-    final categoryList =
-        await MasterService.getCategories();
+      categories = categoryList;
 
-    print(categoryList);
+      //--------------------------------------------------
+      // Difficulty Levels
+      //--------------------------------------------------
 
-    categories = categoryList;
+      print("=================================");
+      print("Loading Levels");
+      print("=================================");
 
-    //--------------------------------------------------
-    // Difficulty Levels
-    //--------------------------------------------------
+      final levelList = await MasterService.getLevels();
 
-    print("=================================");
-    print("Loading Levels");
-    print("=================================");
+      print(levelList);
 
-    final levelList =
-        await MasterService.getLevels();
+      levels = levelList;
 
-    print(levelList);
+      //--------------------------------------------------
+      // User Preferences
+      //--------------------------------------------------
 
-    levels = levelList;
+      print("=================================");
+      print("Loading Preferences");
+      print("=================================");
 
-    //--------------------------------------------------
-    // User Preferences
-    //--------------------------------------------------
+      final pref = await AuthService.getPreferences();
 
-    print("=================================");
-    print("Loading Preferences");
-    print("=================================");
+      print(pref);
 
-    final pref =
-        await AuthService.getPreferences();
+      if (pref["success"] == true) {
+        final data = pref["data"] as Map<String, dynamic>;
 
-    print(pref);
+        selectedLanguageId = data["learning_language_id"];
 
-    if (pref["success"] == true) {
+        selectedCategoryId = data["learning_category_id"];
 
-      final data =
-          pref["data"] as Map<String, dynamic>;
+        selectedDifficultyId = data["difficulty_level_id"];
 
-      selectedLanguageId =
-          data["learning_language_id"];
+        wordsPerSession = data["words_per_session"] ?? 20;
+      }
+    } catch (e, stackTrace) {
+      debugPrint("=================================");
+      debugPrint("Learning Preference Error");
+      debugPrint(e.toString());
+      debugPrint(stackTrace.toString());
+      debugPrint("=================================");
 
-      selectedCategoryId =
-          data["learning_category_id"];
-
-      selectedDifficultyId =
-          data["difficulty_level_id"];
-
-      wordsPerSession =
-          data["words_per_session"] ?? 20;
-
+      if (mounted) {
+        await PopupService.error(context, e.toString());
+      }
     }
 
-  } catch (e, stackTrace) {
+    if (!mounted) return;
 
-    debugPrint("=================================");
-    debugPrint("Learning Preference Error");
-    debugPrint(e.toString());
-    debugPrint(stackTrace.toString());
-    debugPrint("=================================");
-
-    if (mounted) {
-
-      await PopupService.error(
-        context,
-        e.toString(),
-      );
-
-    }
-
+    setState(() {
+      loading = false;
+    });
   }
-
-  if (!mounted) return;
-
-  setState(() {
-    loading = false;
-  });
-
-}
 
   //------------------------------------------------------
   // Helpers
   //------------------------------------------------------
 
   LanguageModel? get selectedLanguage {
-
     try {
-
-      return languages.firstWhere(
-        (e) => e.id == selectedLanguageId,
-      );
-
+      return languages.firstWhere((e) => e.id == selectedLanguageId);
     } catch (_) {
-
       return null;
-
     }
-
   }
 
   CategoryModel? get selectedCategory {
-
     try {
-
-      return categories.firstWhere(
-        (e) => e.id == selectedCategoryId,
-      );
-
+      return categories.firstWhere((e) => e.id == selectedCategoryId);
     } catch (_) {
-
       return null;
-
     }
-
   }
 
   DifficultyModel? get selectedDifficulty {
-
     try {
-
-      return levels.firstWhere(
-        (e) => e.id == selectedDifficultyId,
-      );
-
+      return levels.firstWhere((e) => e.id == selectedDifficultyId);
     } catch (_) {
-
       return null;
-
     }
-
   }
 
-
-    //------------------------------------------------------
+  //------------------------------------------------------
   // Save Preferences
   //------------------------------------------------------
 
   Future<void> savePreference() async {
-
     //----------------------------------------------------
     // Validation
     //----------------------------------------------------
 
     if (selectedLanguageId == null) {
-
-      await PopupService.error(
-        context,
-        "Please select a language.",
-      );
+      await PopupService.error(context, "Please select a language.");
 
       return;
-
     }
 
     if (selectedCategoryId == null) {
-
-      await PopupService.error(
-        context,
-        "Please select a category.",
-      );
+      await PopupService.error(context, "Please select a category.");
 
       return;
-
     }
 
     if (selectedDifficultyId == null) {
-
-      await PopupService.error(
-        context,
-        "Please select a difficulty level.",
-      );
+      await PopupService.error(context, "Please select a difficulty level.");
 
       return;
-
     }
 
     //----------------------------------------------------
 
     setState(() {
-
       saving = true;
-
     });
 
     try {
+      final result = await AuthService.updatePreferences(
+        learningLanguageId: selectedLanguageId!,
 
-      final result =
-          await AuthService.updatePreferences(
+        learningCategoryId: selectedCategoryId!,
 
-        learningLanguageId:
-            selectedLanguageId!,
+        difficultyLevelId: selectedDifficultyId!,
 
-        learningCategoryId:
-            selectedCategoryId!,
-
-        difficultyLevelId:
-            selectedDifficultyId!,
-
-        wordsPerSession:
-            wordsPerSession,
-
+        wordsPerSession: wordsPerSession,
       );
 
       if (!mounted) return;
 
       if (result["success"] == true) {
-
         await PopupService.success(
-
           context,
 
-          result["message"] ??
-              "Preferences saved successfully.",
-
+          result["message"] ?? "Preferences saved successfully.",
         );
 
-        Navigator.pop(
-          context,
-          true,
-        );
-
+        Navigator.pop(context, true);
       } else {
-
         await PopupService.error(
-
           context,
 
-          result["message"] ??
-              "Unable to save preferences.",
-
+          result["message"] ?? "Unable to save preferences.",
         );
-
       }
-
     } catch (e) {
-
       if (!mounted) return;
 
-      await PopupService.error(
-
-        context,
-
-        e.toString(),
-
-      );
-
+      await PopupService.error(context, e.toString());
     }
 
     if (!mounted) return;
 
     setState(() {
-
       saving = false;
-
     });
-
   }
 
   //------------------------------------------------------
   // Download Language
   //------------------------------------------------------
 
-  Future<void> downloadLanguage(
-    LanguageModel language,
-) async {
+  Future<void> downloadLanguage(LanguageModel language) async {
+    showDialog(
+      context: context,
 
-  showDialog(
+      barrierDismissible: false,
 
-    context: context,
-
-    barrierDismissible: false,
-
-    builder: (_) {
-
-      return StatefulBuilder(
-
-        builder: (context, setDialogState) {
-
-          return DownloadProgressDialog(
-
-                notifier: progressNotifier,
-
-            );
-
-        },
-
-      );
-
-    },
-
-  );
-
-  await controller.start(
-
-  languageId: selectedLanguageId!,
-
-  //--------------------------------------------------
-  // Progress Update
-  //--------------------------------------------------
-
-  onProgress: (progress) {
-
-    progressNotifier.value = progress;
-
-  },
-
-  //--------------------------------------------------
-  // Download Completed
-  //--------------------------------------------------
-
-  onCompleted: () async {
-
-    if (Navigator.canPop(context)) {
-
-      Navigator.pop(context);
-
-    }
-
-    await loadData();
-
-    if (!mounted) return;
-
-    await PopupService.success(
-
-      context,
-
-      "Language downloaded successfully.",
-
+      builder: (_) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return DownloadProgressDialog(notifier: progressNotifier);
+          },
+        );
+      },
     );
 
-  },
+    await controller.start(
+      languageId: selectedLanguageId!,
 
-  //--------------------------------------------------
-  // Download Failed
-  //--------------------------------------------------
+      //--------------------------------------------------
+      // Progress Update
+      //--------------------------------------------------
+      onProgress: (progress) {
+        progressNotifier.value = progress;
+      },
 
-  onError: (message) async {
+      //--------------------------------------------------
+      // Download Completed
+      //--------------------------------------------------
+      onCompleted: () async {
+        if (Navigator.canPop(context)) {
+          Navigator.pop(context);
+        }
 
-    if (Navigator.canPop(context)) {
+        await loadData();
 
-      Navigator.pop(context);
+        if (!mounted) return;
 
-    }
+        await PopupService.success(
+          context,
 
-    if (!mounted) return;
+          "Language downloaded successfully.",
+        );
+      },
 
-    await PopupService.error(
+      //--------------------------------------------------
+      // Download Failed
+      //--------------------------------------------------
+      onError: (message) async {
+        if (Navigator.canPop(context)) {
+          Navigator.pop(context);
+        }
 
-      context,
+        if (!mounted) return;
 
-      message,
-
+        await PopupService.error(context, message);
+      },
     );
-
-  },
-
-);
-}
+  }
 
   //------------------------------------------------------
   // Delete Language
   //------------------------------------------------------
 
   Future<void> deleteLanguage() async {
-
     if (selectedLanguage == null) {
-
       return;
-
     }
 
     ScaffoldMessenger.of(context).showSnackBar(
-
-      SnackBar(
-
-        content: Text(
-
-          "${selectedLanguage!.name} removed.",
-
-        ),
-
-      ),
-
+      SnackBar(content: Text("${selectedLanguage!.name} removed.")),
     );
 
     // TODO:
     // Delete downloaded files
-
   }
 
-
-    //------------------------------------------------------
+  //------------------------------------------------------
   // UI
   //------------------------------------------------------
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-
-      appBar: AppBar(
-        title: const Text(
-          "Learning Preferences",
-        ),
-      ),
+      appBar: AppBar(title: const Text("Learning Preferences")),
 
       body: loading
-
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
-
+          ? const Center(child: CircularProgressIndicator())
           : SingleChildScrollView(
-
               padding: const EdgeInsets.all(20),
 
               child: Column(
-
-                crossAxisAlignment:
-                    CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
 
                 children: [
-
                   //--------------------------------------------------
                   // Language
                   //--------------------------------------------------
-
                   LanguageDropdown(
-
                     languages: languages,
 
-                    selectedId:
-                        selectedLanguageId,
+                    selectedId: selectedLanguageId,
 
                     onChanged: (value) {
-
                       setState(() {
-
-                        selectedLanguageId =
-                            value;
-
+                        selectedLanguageId = value;
                       });
-
                     },
-
                   ),
 
                   const SizedBox(height: 20),
@@ -588,25 +401,15 @@ class _LearningPreferencesScreenState
                   //--------------------------------------------------
                   // Download Card
                   //--------------------------------------------------
-
                   if (selectedLanguage != null)
-
                     DownloadLanguageCard(
-
-                      language:
-                          selectedLanguage!,
+                      language: selectedLanguage!,
 
                       onDownload: () {
-
-                          downloadLanguage(
-                          selectedLanguage!,
-                        );
-
+                        downloadLanguage(selectedLanguage!);
                       },
-                
-                      onDelete:
-                          deleteLanguage,
 
+                      onDelete: deleteLanguage,
                     ),
 
                   const SizedBox(height: 25),
@@ -614,25 +417,16 @@ class _LearningPreferencesScreenState
                   //--------------------------------------------------
                   // Category
                   //--------------------------------------------------
-
                   CategoryDropdown(
-
                     categories: categories,
 
-                    selectedId:
-                        selectedCategoryId,
+                    selectedId: selectedCategoryId,
 
                     onChanged: (value) {
-
                       setState(() {
-
-                        selectedCategoryId =
-                            value;
-
+                        selectedCategoryId = value;
                       });
-
                     },
-
                   ),
 
                   const SizedBox(height: 20),
@@ -640,25 +434,16 @@ class _LearningPreferencesScreenState
                   //--------------------------------------------------
                   // Difficulty
                   //--------------------------------------------------
-
                   DifficultyDropdown(
-
                     levels: levels,
 
-                    selectedId:
-                        selectedDifficultyId,
+                    selectedId: selectedDifficultyId,
 
                     onChanged: (value) {
-
                       setState(() {
-
-                        selectedDifficultyId =
-                            value;
-
+                        selectedDifficultyId = value;
                       });
-
                     },
-
                   ),
 
                   const SizedBox(height: 20),
@@ -666,56 +451,32 @@ class _LearningPreferencesScreenState
                   //--------------------------------------------------
                   // Words Per Session
                   //--------------------------------------------------
-
                   DropdownButtonFormField<int>(
-
                     value: wordsPerSession,
 
-                    decoration:
-                        const InputDecoration(
+                    decoration: const InputDecoration(
+                      labelText: "Words Per Session",
 
-                      labelText:
-                          "Words Per Session",
+                      prefixIcon: Icon(Icons.menu_book),
 
-                      prefixIcon:
-                          Icon(Icons.menu_book),
-
-                      border:
-                          OutlineInputBorder(),
-
+                      border: OutlineInputBorder(),
                     ),
 
-                    items: sessionList.map(
+                    items: sessionList.map((item) {
+                      return DropdownMenuItem<int>(
+                        value: item,
 
-                      (item) {
-
-                        return DropdownMenuItem<int>(
-
-                          value: item,
-
-                          child: Text(
-                            "$item Words",
-                          ),
-
-                        );
-
-                      },
-
-                    ).toList(),
+                        child: Text("$item Words"),
+                      );
+                    }).toList(),
 
                     onChanged: (value) {
-
                       if (value == null) return;
 
                       setState(() {
-
-                        wordsPerSession =
-                            value;
-
+                        wordsPerSession = value;
                       });
-
                     },
-
                   ),
 
                   const SizedBox(height: 40),
@@ -723,64 +484,32 @@ class _LearningPreferencesScreenState
                   //--------------------------------------------------
                   // Save Button
                   //--------------------------------------------------
-
                   SizedBox(
-
                     width: double.infinity,
 
                     height: 55,
 
                     child: ElevatedButton.icon(
-
-                      onPressed:
-                          saving
-                              ? null
-                              : savePreference,
+                      onPressed: saving ? null : savePreference,
 
                       icon: saving
-
                           ? const SizedBox(
-
                               width: 20,
 
                               height: 20,
 
-                              child:
-                                  CircularProgressIndicator(
-                                strokeWidth: 2,
-                              ),
-
+                              child: CircularProgressIndicator(strokeWidth: 2),
                             )
+                          : const Icon(Icons.save),
 
-                          : const Icon(
-                              Icons.save,
-                            ),
-
-                      label: Text(
-
-                        saving
-
-                            ? "Saving..."
-
-                            : "SAVE PREFERENCES",
-
-                      ),
-
+                      label: Text(saving ? "Saving..." : "SAVE PREFERENCES"),
                     ),
-
                   ),
 
                   const SizedBox(height: 30),
-
                 ],
-
               ),
-
             ),
-
     );
-
   }
-
-
 }

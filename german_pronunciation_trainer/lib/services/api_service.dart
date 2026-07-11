@@ -181,31 +181,47 @@ class ApiService {
   }
 
   //---------------------------------------------------------
-  // Random Word
-  //---------------------------------------------------------
+// Random Word
+//---------------------------------------------------------
 
-  static Future<Word> getRandomWord() async {
-    final response = await http.get(Uri.parse("$baseUrl/words/random"));
+static Future<Word> getRandomWord({
 
-    print("==================================");
-    print("GET RANDOM WORD");
-    print("Status Code: ${response.statusCode}");
-    print("Response:");
-    print(response.body);
-    print("==================================");
+  required String token,
 
-    if (response.statusCode != 200) {
-      throw Exception("Failed to load word");
-    }
+}) async {
 
-    final Map<String, dynamic> json = jsonDecode(response.body);
+  final response = await http.get(
 
-    if (json.containsKey("data")) {
-      return Word.fromJson(json["data"]);
-    }
+    Uri.parse("$baseUrl/words/random"),
 
-    return Word.fromJson(json);
+    headers: {
+
+      "Authorization": "Bearer $token",
+
+    },
+
+  );
+
+  print("==================================");
+  print("GET RANDOM WORD");
+  print("Status Code : ${response.statusCode}");
+  print("Response:");
+  print(response.body);
+  print("==================================");
+
+  if (response.statusCode != 200) {
+
+    throw Exception(response.body);
+
   }
+
+  return Word.fromJson(
+
+    jsonDecode(response.body),
+
+  );
+
+}
 
   //---------------------------------------------------------
   // Get Learning Preferences

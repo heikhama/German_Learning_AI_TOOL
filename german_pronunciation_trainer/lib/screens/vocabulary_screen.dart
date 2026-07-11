@@ -1,69 +1,69 @@
 import 'package:flutter/material.dart';
 
-import '../models/word.dart';
-import '../services/api_service.dart';
+import '../models/vocabulary.dart';
+import '../services/vocabulary_service.dart';
 
 class VocabularyScreen extends StatefulWidget {
+
   const VocabularyScreen({super.key});
 
   @override
   State<VocabularyScreen> createState() =>
       _VocabularyScreenState();
+
 }
 
 class _VocabularyScreenState
     extends State<VocabularyScreen> {
 
-  Word? currentWord;
+  List<Vocabulary> vocabulary = [];
 
-  bool isLoading = false;
+  List<Vocabulary> filteredVocabulary = [];
 
+  bool loading = true;
+
+  final TextEditingController searchController =
+      TextEditingController();
+
+  //---------------------------------------------------------
   @override
   void initState() {
+
     super.initState();
-    loadWord();
+
+    loadVocabulary();
+
   }
 
-  //----------------------------------------------------------
-  // Load Random Word
-  //----------------------------------------------------------
-
-  Future<void> loadWord() async {
-
-    setState(() {
-
-      isLoading = true;
-
-    });
+  //---------------------------------------------------------
+  Future<void> loadVocabulary() async {
 
     try {
 
-      final Word word =
-          await ApiService.getRandomWord();
-
-      // debugPrint("German : ${word.word}");
-      // debugPrint("Meaning: ${word.meaning}");
-      // debugPrint("Level  : ${word.level}");
+      final list =
+          await VocabularyService.getVocabulary();
 
       if (!mounted) return;
 
       setState(() {
 
-        currentWord = word;
+        vocabulary = list;
 
-        isLoading = false;
+        filteredVocabulary = list;
+
+        loading = false;
 
       });
 
     } catch (e) {
 
-      debugPrint("Load Word Error : $e");
+      debugPrint(e.toString());
 
       if (!mounted) return;
 
       setState(() {
 
-        isLoading = false;
+        loading = false;
 
       });
 
@@ -71,129 +71,159 @@ class _VocabularyScreenState
 
   }
 
-  //----------------------------------------------------------
+  //---------------------------------------------------------
+  void searchWord(String keyword) {
+
+    setState(() {
+
+      filteredVocabulary = vocabulary.where((item) {
+
+        return item.word
+                .toLowerCase()
+                .contains(keyword.toLowerCase()) ||
+
+            item.meaning
+                .toLowerCase()
+                .contains(keyword.toLowerCase());
+
+      }).toList();
+
+    });
+
+  }
+
+  //---------------------------------------------------------
 
   @override
   Widget build(BuildContext context) {
 
-    return Padding(
+    if (loading) {
 
-      padding: const EdgeInsets.all(20),
+      return const Center(
 
-      child: Center(
+        child: CircularProgressIndicator(),
 
-        child: isLoading
+      );
 
-            ? const CircularProgressIndicator()
+    }
 
-            : currentWord == null
+    return Column(
 
-                ? const Text(
+      children: [
 
-                    "No Word Found",
+        //--------------------------------------------------
+        // Search Box
+        //--------------------------------------------------
 
-                    style: TextStyle(
-                      fontSize: 18,
+        Padding(
+
+          padding: const EdgeInsets.all(15),
+
+          child: TextField(
+
+            controller: searchController,
+
+            decoration: InputDecoration(
+
+              hintText: "Search vocabulary",
+
+              prefixIcon: const Icon(Icons.search),
+
+              border: OutlineInputBorder(
+
+                borderRadius:
+                    BorderRadius.circular(12),
+
+              ),
+
+            ),
+
+            onChanged: searchWord,
+
+          ),
+
+        ),
+
+        //--------------------------------------------------
+        // List
+        //--------------------------------------------------
+
+        Expanded(
+
+          child: ListView.builder(
+
+            itemCount: filteredVocabulary.length,
+
+            itemBuilder: (context, index) {
+
+              final word =
+                  filteredVocabulary[index];
+
+              return Card(
+
+                margin: const EdgeInsets.symmetric(
+
+                  horizontal: 15,
+
+                  vertical: 6,
+
+                ),
+
+                child: ListTile(
+
+                  leading: CircleAvatar(
+
+                    child: Text(
+
+                      word.cefrLevel,
+
                     ),
-
-                  )
-
-                : Column(
-
-                    mainAxisAlignment:
-                        MainAxisAlignment.center,
-
-                    children: [
-
-                      const Text(
-
-                        "German Word",
-
-                        style: TextStyle(
-
-                          fontSize: 18,
-
-                          fontWeight:
-                              FontWeight.w500,
-
-                        ),
-
-                      ),
-
-                      const SizedBox(height: 20),
-
-                      Text(
-
-                        currentWord!.word,
-
-                        style: const TextStyle(
-
-                          fontSize: 42,
-
-                          fontWeight:
-                              FontWeight.bold,
-
-                        ),
-
-                      ),
-
-                      const SizedBox(height: 20),
-
-                      Text(
-
-                        currentWord!.meaning,
-
-                        style: const TextStyle(
-
-                          fontSize: 24,
-
-                        ),
-
-                      ),
-
-                      const SizedBox(height: 15),
-
-                      Text(
-
-                        "Level : ${currentWord!.level}",
-
-                        style: const TextStyle(
-
-                          fontSize: 18,
-
-                          color: Colors.grey,
-
-                        ),
-
-                      ),
-
-                      const SizedBox(height: 40),
-
-                      SizedBox(
-
-                        width: 220,
-
-                        child: ElevatedButton.icon(
-
-                          onPressed: loadWord,
-
-                          icon: const Icon(
-                            Icons.refresh,
-                          ),
-
-                          label: const Text(
-                            "Next Word",
-                          ),
-
-                        ),
-
-                      ),
-
-                    ],
 
                   ),
 
-      ),
+                  title: Text(
+
+                    word.word,
+
+                    style: const TextStyle(
+
+                      fontWeight: FontWeight.bold,
+
+                    ),
+
+                  ),
+
+                  subtitle: Text(
+
+                    word.meaning,
+
+                  ),
+
+                  trailing: const Icon(
+
+                    Icons.arrow_forward_ios,
+
+                    size: 18,
+
+                  ),
+
+                  onTap: () {
+
+                    // Phase 3
+
+                  },
+
+                ),
+
+              );
+
+            },
+
+          ),
+
+        ),
+
+      ],
 
     );
 

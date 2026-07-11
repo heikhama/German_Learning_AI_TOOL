@@ -27,22 +27,29 @@ class WordCard extends StatelessWidget {
 
       shape: RoundedRectangleBorder(
 
-        borderRadius:
-            BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(20),
 
       ),
 
       child: Padding(
 
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(24),
 
         child: Column(
 
+          mainAxisSize: MainAxisSize.min,
+
           children: [
+
+            //--------------------------------------------------
+            // Word
+            //--------------------------------------------------
 
             Text(
 
               word.word,
+
+              textAlign: TextAlign.center,
 
               style: const TextStyle(
 
@@ -54,61 +61,97 @@ class WordCard extends StatelessWidget {
 
             ),
 
-            const SizedBox(height: 15),
+            const SizedBox(height: 20),
+
+            //--------------------------------------------------
+            // English Meaning
+            //--------------------------------------------------
 
             Text(
 
               word.meaning,
 
+              textAlign: TextAlign.center,
+
               style: const TextStyle(
 
                 fontSize: 22,
+
+                color: Colors.grey,
 
               ),
 
             ),
 
-            const SizedBox(height: 15),
+            const SizedBox(height: 30),
 
-            Text(
-
-              "Level ${word.level}",
-
-            ),
-
-            const SizedBox(height: 25),
+            //--------------------------------------------------
+            // Action Buttons
+            //--------------------------------------------------
 
             Row(
 
-              mainAxisAlignment:
-                  MainAxisAlignment.spaceEvenly,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
 
               children: [
 
                 IconButton(
 
-                  onPressed: () {},
+                  tooltip: "Listen",
+
+                  onPressed: () {
+
+                    // TODO: Text-to-Speech
+
+                  },
 
                   icon: const Icon(
-                      Icons.volume_up),
+
+                    Icons.volume_up,
+
+                    size: 30,
+
+                  ),
 
                 ),
 
                 IconButton(
 
-                  onPressed: () {},
+                  tooltip: "Practice",
+
+                  onPressed: () {
+
+                    // TODO: Speech Recognition
+
+                  },
 
                   icon: const Icon(
-                      Icons.mic),
+
+                    Icons.mic,
+
+                    size: 30,
+
+                  ),
 
                 ),
 
                 IconButton(
 
-                  onPressed: () {},
+                  tooltip: "Favorite",
+
+                  onPressed: () {
+
+                    // TODO: Save Favorite
+
+                  },
 
                   icon: const Icon(
-                      Icons.favorite_border),
+
+                    Icons.favorite_border,
+
+                    size: 30,
+
+                  ),
 
                 ),
 
@@ -116,16 +159,35 @@ class WordCard extends StatelessWidget {
 
             ),
 
-            const SizedBox(height: 15),
+            const SizedBox(height: 25),
 
-            ElevatedButton(
+            //--------------------------------------------------
+            // Next Word Button
+            //--------------------------------------------------
 
-              onPressed: onNext,
+            SizedBox(
 
-              child:
-                  const Text("Next Word"),
+              width: double.infinity,
 
-            )
+              child: ElevatedButton.icon(
+
+                onPressed: onNext,
+
+                icon: const Icon(
+
+                  Icons.arrow_forward,
+
+                ),
+
+                label: const Text(
+
+                  "Next Word",
+
+                ),
+
+              ),
+
+            ),
 
           ],
 

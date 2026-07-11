@@ -244,11 +244,11 @@ def update_learning_preferences(
 
 ):
 
-    current_user.learning_language = (
+    current_user.learning_language_id = (
         request.learning_language_id
     )
 
-    current_user.learning_category = (
+    current_user.learning_category_id = (
         request.learning_category_id
     )
 

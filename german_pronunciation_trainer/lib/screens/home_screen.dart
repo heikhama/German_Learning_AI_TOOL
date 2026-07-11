@@ -43,15 +43,33 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> loadWord() async {
-    final word = await ApiService.getRandomWord();
+    try {
+      final token = await AuthService.getToken();
 
-    if (!mounted) return;
+      print("TOKEN : $token");
 
-    setState(() {
-      currentWord = word;
+      final word = await ApiService.getRandomWord(token: token!);
 
-      loading = false;
-    });
+      print("WORD : ${word.word}");
+
+      if (!mounted) return;
+
+      setState(() {
+        currentWord = word;
+
+        loading = false;
+      });
+    } catch (e) {
+      print("LOAD WORD ERROR");
+
+      print(e);
+
+      if (!mounted) return;
+
+      setState(() {
+        loading = false;
+      });
+    }
   }
 
   Future<void> loadProfile() async {
@@ -118,7 +136,19 @@ class _HomeScreenState extends State<HomeScreen> {
 
           const SectionTitle(title: "Today's Word"),
 
-          WordCard(word: currentWord!, onNext: loadWord),
+          // WordCard(word: currentWord!, onNext: loadWord),
+    
+
+          if (currentWord == null)
+            const Card(
+              child: Padding(
+                padding: EdgeInsets.all(20),
+
+                child: Text("No word available", textAlign: TextAlign.center),
+              ),
+            )
+          else
+            WordCard(word: currentWord!, onNext: loadWord),
         ],
       ),
     );
