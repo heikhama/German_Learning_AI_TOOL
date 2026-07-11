@@ -14,6 +14,9 @@ class DashboardHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final language = user?.learningLanguage ?? "English"; // dynamic language
+    final name = user?.name ?? "Guest";                   // dynamic name
+
     return Row(
       children: [
         Expanded(
@@ -21,14 +24,14 @@ class DashboardHeader extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "Hello ${user?.name ?? "Guest"} 👋",
+                "Hello $name 👋",
                 style: AppText.heading,
               ),
 
               const SizedBox(height: 6),
 
               Text(
-                "Learn German with Artificial Intelligence",
+                "Learn $language with Artificial Intelligence",
                 style: AppText.subtitle,
               ),
             ],
@@ -38,15 +41,12 @@ class DashboardHeader extends StatelessWidget {
         CircleAvatar(
           radius: 25,
           backgroundColor: Colors.grey.shade200,
-          backgroundImage:
-              user == null || user!.avatar.isEmpty
-                  ? const AssetImage(
-                      "assets/images/avatar.png",
-                    ) as ImageProvider
-                  : NetworkImage(
-                      "${ApiService.baseUrl}${user!.avatar}"
-                      "?t=${DateTime.now().millisecondsSinceEpoch}",
-                    ),
+          backgroundImage: (user != null && user!.avatar.isNotEmpty)
+              ? NetworkImage(
+                  "${ApiService.baseUrl}${user!.avatar}"
+                  "?t=${DateTime.now().millisecondsSinceEpoch}",
+                )
+              : const AssetImage("assets/images/avatar.png") as ImageProvider,
         ),
       ],
     );

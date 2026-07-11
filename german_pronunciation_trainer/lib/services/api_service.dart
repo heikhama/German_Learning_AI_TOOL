@@ -233,41 +233,108 @@ class ApiService {
   //---------------------------------------------------------
 
   static Future<Map<String, dynamic>> updatePreferences({
-    required String token,
+  required String token,
+  required int learningLanguageId,
+  required int learningCategoryId,
+  required int difficultyLevelId,
+  required int wordsPerSession,
+}) async {
 
-    required String language,
+  final response = await http.put(
+    Uri.parse("$baseUrl/user/preferences"),
+    headers: {
+      "Authorization": "Bearer $token",
+      "Content-Type": "application/json",
+    },
+    body: jsonEncode({
+      "learning_language_id": learningLanguageId,
+      "learning_category_id": learningCategoryId,
+      "difficulty_level_id": difficultyLevelId,
+      "words_per_session": wordsPerSession,
+    }),
+  );
 
-    required String category,
+  return jsonDecode(response.body);
+}
 
-    required String level,
 
-    required int wordsPerSession,
-  }) async {
-    final response = await http.put(
-      Uri.parse("$baseUrl/user/preferences"),
+  static Future<Map<String, dynamic>> getLanguages() async {
 
-      headers: {
-        "Authorization": "Bearer $token",
+  final response = await http.get(
+    Uri.parse("$baseUrl/master/languages"),
+  );
 
-        "Content-Type": "application/json",
-      },
+  return jsonDecode(response.body);
+}
 
-      body: jsonEncode({
-        "learning_language": language,
+static Future<Map<String, dynamic>> getCategories() async {
 
-        "learning_category": category,
+  final response = await http.get(
+    Uri.parse("$baseUrl/master/categories"),
+  );
 
-        "learning_level": level,
+  return jsonDecode(response.body);
+}
 
-        "words_per_session": wordsPerSession,
-      }),
-    );
+static Future<Map<String, dynamic>> getDifficultyLevels() async {
 
-    print("======================================");
-    print("UPDATE PREFERENCES");
-    print(response.body);
-    print("======================================");
+  final response = await http.get(
+    Uri.parse("$baseUrl/master/difficulty-levels"),
+  );
 
-    return jsonDecode(response.body);
-  }
+  return jsonDecode(response.body);
+}
+
+
+//---------------------------------------------------------
+// Download Language
+//---------------------------------------------------------
+
+static Future<Map<String,dynamic>> downloadLanguage({
+
+  required int languageId,
+
+}) async {
+
+  final response = await http.post(
+
+    Uri.parse(
+
+      "$baseUrl/language/download/$languageId",
+
+    ),
+
+  );
+
+  return jsonDecode(response.body);
+
+}
+
+//---------------------------------------------------------
+// Download Status
+//---------------------------------------------------------
+
+static Future<Map<String,dynamic>> getDownloadStatus(
+
+  int jobId,
+
+) async {
+
+  final response = await http.get(
+
+    Uri.parse(
+
+      "$baseUrl/language/download/status/$jobId",
+
+    ),
+
+  );
+
+  return jsonDecode(response.body);
+
+}
+
+
+
+
 }

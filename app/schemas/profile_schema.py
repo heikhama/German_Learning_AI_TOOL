@@ -1,8 +1,9 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel
+from pydantic import EmailStr
 
 
 # ==========================================================
-# User Profile Response
+# User Profile
 # ==========================================================
 
 class UserProfileResponse(BaseModel):
@@ -15,15 +16,31 @@ class UserProfileResponse(BaseModel):
 
     avatar: str
 
-    # ------------------------------------
-    # Learning Preferences
-    # ------------------------------------
+    # -----------------------------
+    # Language
+    # -----------------------------
+
+    learning_language_id: int
 
     learning_language: str
 
+    # -----------------------------
+    # Category
+    # -----------------------------
+
+    learning_category_id: int
+
     learning_category: str
 
+    # -----------------------------
+    # Difficulty
+    # -----------------------------
+
+    difficulty_level_id: int
+
     learning_level: str
+
+    # -----------------------------
 
     words_per_session: int
 
@@ -62,15 +79,15 @@ class ChangePasswordRequest(BaseModel):
 
 
 # ==========================================================
-# Update Learning Preferences
+# Update Preferences
 # ==========================================================
 
 class UpdateLearningPreferenceRequest(BaseModel):
 
-    learning_language: str
+    learning_language_id: int
 
-    learning_category: str
+    learning_category_id: int
 
-    learning_level: str
+    difficulty_level_id: int
 
     words_per_session: int

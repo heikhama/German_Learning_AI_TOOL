@@ -38,6 +38,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
     loadProfile();
   }
 
+  // @override
+  // void didChangeDependencies() {
+  //   super.didChangeDependencies();
+  //   loadProfile(); // refresh whenever screen is opened
+  // }
+
   //------------------------------------------------------
 
   Future<void> loadProfile() async {
@@ -84,6 +90,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
                   child: CircularProgressIndicator(),
                 )
+              : user == null
+                  ? const Padding(
+                      padding: EdgeInsets.all(20),
+                      child: Text("No profile data found"),
+                    )
               : Container(
                   width: double.infinity,
 
@@ -158,6 +169,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
               if (updated == true) {
                 await loadProfile();
+                // Navigator.pop(context, true); // bubble update
               }
             },
           ),
@@ -234,6 +246,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
               if (updated == true) {
                 await loadProfile();
+                // Navigator.pop(context, true); // bubble up to HomeScreen
               }
             },
           ),

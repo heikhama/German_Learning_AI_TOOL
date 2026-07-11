@@ -252,38 +252,34 @@ class AuthService {
   }
 
   //---------------------------------------------------------
-  // Update Learning Preferences
-  //---------------------------------------------------------
+// Update Learning Preferences
+//---------------------------------------------------------
+static Future<Map<String, dynamic>> updatePreferences({
+  required int learningLanguageId,
+  required int learningCategoryId,
+  required int difficultyLevelId,
+  required int wordsPerSession,
+}) async {
 
-  static Future<Map<String, dynamic>> updatePreferences({
-    required String language,
+  final token = await StorageService.getToken();
 
-    required String category,
-
-    required String level,
-
-    required int wordsPerSession,
-  }) async {
-    try {
-      final token = await StorageService.getToken();
-
-      if (token == null) {
-        return {"success": false, "message": "Please login again"};
-      }
-
-      return await ApiService.updatePreferences(
-        token: token,
-
-        language: language,
-
-        category: category,
-
-        level: level,
-
-        wordsPerSession: wordsPerSession,
-      );
-    } catch (e) {
-      return {"success": false, "message": e.toString()};
-    }
+  if (token == null) {
+    return {
+      "success": false,
+      "message": "Please login again",
+    };
   }
+
+  return await ApiService.updatePreferences(
+    token: token,
+    learningLanguageId: learningLanguageId,
+    learningCategoryId: learningCategoryId,
+    difficultyLevelId: difficultyLevelId,
+    wordsPerSession: wordsPerSession,
+  );
+}
+
+
+
+
 }

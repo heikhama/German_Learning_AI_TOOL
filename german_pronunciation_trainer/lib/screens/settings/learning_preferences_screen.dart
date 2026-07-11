@@ -1,8 +1,21 @@
 import 'package:flutter/material.dart';
 
+import '../../models/category_model.dart';
+import '../../models/difficulty_model.dart';
+import '../../models/language_model.dart';
+
 import '../../services/auth_service.dart';
+import '../../services/master_service.dart';
 import '../../services/popup_service.dart';
 
+import '../../widgets/category_dropdown.dart';
+import '../../widgets/difficulty_dropdown.dart';
+import '../../widgets/download_language_card.dart';
+import '../../widgets/language_dropdown.dart';
+
+import '../../models/download_progress.dart';
+import '../../controllers/download_controller.dart';
+import '../../widgets/download_progress_dialog.dart';
 class LearningPreferencesScreen extends StatefulWidget {
   const LearningPreferencesScreen({super.key});
 
@@ -14,158 +27,292 @@ class LearningPreferencesScreen extends StatefulWidget {
 class _LearningPreferencesScreenState
     extends State<LearningPreferencesScreen> {
 
+  //------------------------------------------------------
+  // Loading
+  //------------------------------------------------------
+
   bool loading = true;
+
   bool saving = false;
 
+  late final DownloadController controller;
+
+  // DownloadController controller = DownloadController();
+
+  // DownloadProgress? progress;
+  final ValueNotifier<DownloadProgress?> progressNotifier =
+    ValueNotifier(null);
+
   //------------------------------------------------------
-  // Default Values
+  // Master Data
   //------------------------------------------------------
 
-  String language = "German";
+  List<LanguageModel> languages = [];
 
-  String category = "Daily Conversation";
+  List<CategoryModel> categories = [];
 
-  String level = "A1";
+  List<DifficultyModel> levels = [];
+
+  //------------------------------------------------------
+  // Selected Values
+  //------------------------------------------------------
+
+  int? selectedLanguageId;
+
+  int? selectedCategoryId;
+
+  int? selectedDifficultyId;
 
   int wordsPerSession = 20;
 
-  //------------------------------------------------------
-  // Dropdown Lists
-  //------------------------------------------------------
-
-  final List<String> languages = [
-
-    "German",
-
-    "English",
-
-    "French",
-
-    "Spanish",
-
-    "Italian",
-
-    "Japanese",
-
-    "Korean",
-
-    "Chinese",
-
-    "Russian",
-
-  ];
-
-  final List<String> categories = [
-
-    "Daily Conversation",
-
-    "Travel",
-
-    "Technology",
-
-    "Business",
-
-    "Medical",
-
-    "Education",
-
-    "Shopping",
-
-    "Food",
-
-    "Sports",
-
-    "Grammar",
-
-    "Pronunciation",
-
-    "Nouns",
-
-    "Verbs",
-
-    "Adjectives",
-
-    "Numbers",
-
-    "Family",
-
-  ];
-
-  final List<String> levels = [
-
-    "A1",
-
-    "A2",
-
-    "B1",
-
-    "B2",
-
-    "C1",
-
-    "C2",
-
-  ];
-
-  final List<int> sessionWords = [
-
+  final List<int> sessionList = [
     5,
-
     10,
-
     20,
-
     30,
-
     50,
-
     100,
-
   ];
 
   //------------------------------------------------------
 
   @override
   void initState() {
+
     super.initState();
 
-    loadPreference();
+    controller = DownloadController();
+
+    loadData();
+
+  }
+
+  @override
+  void dispose() {
+
+    controller.dispose();
+
+    progressNotifier.dispose();
+
+    super.dispose();
+
   }
 
   //------------------------------------------------------
+  // Load Data
+  //------------------------------------------------------
 
-  Future<void> loadPreference() async {
+  Future<void> loadData() async {
 
-    final result =
+  if (!mounted) return;
+
+  setState(() {
+    loading = true;
+  });
+
+  try {
+
+    //--------------------------------------------------
+    // Languages
+    //--------------------------------------------------
+
+    print("=================================");
+    print("Loading Languages");
+    print("=================================");
+
+    final languageList =
+        await MasterService.getLanguages();
+
+    print(languageList);
+
+    languages = languageList;
+
+    //--------------------------------------------------
+    // Categories
+    //--------------------------------------------------
+
+    print("=================================");
+    print("Loading Categories");
+    print("=================================");
+
+    final categoryList =
+        await MasterService.getCategories();
+
+    print(categoryList);
+
+    categories = categoryList;
+
+    //--------------------------------------------------
+    // Difficulty Levels
+    //--------------------------------------------------
+
+    print("=================================");
+    print("Loading Levels");
+    print("=================================");
+
+    final levelList =
+        await MasterService.getLevels();
+
+    print(levelList);
+
+    levels = levelList;
+
+    //--------------------------------------------------
+    // User Preferences
+    //--------------------------------------------------
+
+    print("=================================");
+    print("Loading Preferences");
+    print("=================================");
+
+    final pref =
         await AuthService.getPreferences();
 
-    if (!mounted) return;
+    print(pref);
 
-    if (result["success"] == true) {
+    if (pref["success"] == true) {
 
-      final data = result["data"];
+      final data =
+          pref["data"] as Map<String, dynamic>;
 
-      language = data["learning_language"];
+      selectedLanguageId =
+          data["learning_language_id"];
 
-      category = data["learning_category"];
+      selectedCategoryId =
+          data["learning_category_id"];
 
-      level = data["learning_level"];
+      selectedDifficultyId =
+          data["difficulty_level_id"];
 
       wordsPerSession =
-          data["words_per_session"];
+          data["words_per_session"] ?? 20;
+
     }
 
-    setState(() {
+  } catch (e, stackTrace) {
 
-      loading = false;
+    debugPrint("=================================");
+    debugPrint("Learning Preference Error");
+    debugPrint(e.toString());
+    debugPrint(stackTrace.toString());
+    debugPrint("=================================");
 
-    });
+    if (mounted) {
+
+      await PopupService.error(
+        context,
+        e.toString(),
+      );
+
+    }
 
   }
 
+  if (!mounted) return;
+
+  setState(() {
+    loading = false;
+  });
+
+}
+
+  //------------------------------------------------------
+  // Helpers
+  //------------------------------------------------------
+
+  LanguageModel? get selectedLanguage {
+
+    try {
+
+      return languages.firstWhere(
+        (e) => e.id == selectedLanguageId,
+      );
+
+    } catch (_) {
+
+      return null;
+
+    }
+
+  }
+
+  CategoryModel? get selectedCategory {
+
+    try {
+
+      return categories.firstWhere(
+        (e) => e.id == selectedCategoryId,
+      );
+
+    } catch (_) {
+
+      return null;
+
+    }
+
+  }
+
+  DifficultyModel? get selectedDifficulty {
+
+    try {
+
+      return levels.firstWhere(
+        (e) => e.id == selectedDifficultyId,
+      );
+
+    } catch (_) {
+
+      return null;
+
+    }
+
+  }
+
+
+    //------------------------------------------------------
+  // Save Preferences
   //------------------------------------------------------
 
   Future<void> savePreference() async {
+
+    //----------------------------------------------------
+    // Validation
+    //----------------------------------------------------
+
+    if (selectedLanguageId == null) {
+
+      await PopupService.error(
+        context,
+        "Please select a language.",
+      );
+
+      return;
+
+    }
+
+    if (selectedCategoryId == null) {
+
+      await PopupService.error(
+        context,
+        "Please select a category.",
+      );
+
+      return;
+
+    }
+
+    if (selectedDifficultyId == null) {
+
+      await PopupService.error(
+        context,
+        "Please select a difficulty level.",
+      );
+
+      return;
+
+    }
+
+    //----------------------------------------------------
 
     setState(() {
 
@@ -173,18 +320,69 @@ class _LearningPreferencesScreenState
 
     });
 
-    final result =
-        await AuthService.updatePreferences(
+    try {
 
-      language: language,
+      final result =
+          await AuthService.updatePreferences(
 
-      category: category,
+        learningLanguageId:
+            selectedLanguageId!,
 
-      level: level,
+        learningCategoryId:
+            selectedCategoryId!,
 
-      wordsPerSession: wordsPerSession,
+        difficultyLevelId:
+            selectedDifficultyId!,
 
-    );
+        wordsPerSession:
+            wordsPerSession,
+
+      );
+
+      if (!mounted) return;
+
+      if (result["success"] == true) {
+
+        await PopupService.success(
+
+          context,
+
+          result["message"] ??
+              "Preferences saved successfully.",
+
+        );
+
+        Navigator.pop(
+          context,
+          true,
+        );
+
+      } else {
+
+        await PopupService.error(
+
+          context,
+
+          result["message"] ??
+              "Unable to save preferences.",
+
+        );
+
+      }
+
+    } catch (e) {
+
+      if (!mounted) return;
+
+      await PopupService.error(
+
+        context,
+
+        e.toString(),
+
+      );
+
+    }
 
     if (!mounted) return;
 
@@ -194,32 +392,143 @@ class _LearningPreferencesScreenState
 
     });
 
-    if (result["success"] == true) {
+  }
 
-      await PopupService.success(
+  //------------------------------------------------------
+  // Download Language
+  //------------------------------------------------------
 
-        context,
+  Future<void> downloadLanguage(
+    LanguageModel language,
+) async {
 
-        result["message"],
+  showDialog(
+
+    context: context,
+
+    barrierDismissible: false,
+
+    builder: (_) {
+
+      return StatefulBuilder(
+
+        builder: (context, setDialogState) {
+
+          return DownloadProgressDialog(
+
+                notifier: progressNotifier,
+
+            );
+
+        },
 
       );
 
-      Navigator.pop(context, true);
+    },
 
-    } else {
+  );
 
-      await PopupService.error(
+  await controller.start(
 
-        context,
+  languageId: selectedLanguageId!,
 
-        result["message"],
+  //--------------------------------------------------
+  // Progress Update
+  //--------------------------------------------------
 
-      );
+  onProgress: (progress) {
+
+    progressNotifier.value = progress;
+
+  },
+
+  //--------------------------------------------------
+  // Download Completed
+  //--------------------------------------------------
+
+  onCompleted: () async {
+
+    if (Navigator.canPop(context)) {
+
+      Navigator.pop(context);
 
     }
 
+    await loadData();
+
+    if (!mounted) return;
+
+    await PopupService.success(
+
+      context,
+
+      "Language downloaded successfully.",
+
+    );
+
+  },
+
+  //--------------------------------------------------
+  // Download Failed
+  //--------------------------------------------------
+
+  onError: (message) async {
+
+    if (Navigator.canPop(context)) {
+
+      Navigator.pop(context);
+
+    }
+
+    if (!mounted) return;
+
+    await PopupService.error(
+
+      context,
+
+      message,
+
+    );
+
+  },
+
+);
+}
+
+  //------------------------------------------------------
+  // Delete Language
+  //------------------------------------------------------
+
+  Future<void> deleteLanguage() async {
+
+    if (selectedLanguage == null) {
+
+      return;
+
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+
+      SnackBar(
+
+        content: Text(
+
+          "${selectedLanguage!.name} removed.",
+
+        ),
+
+      ),
+
+    );
+
+    // TODO:
+    // Delete downloaded files
+
   }
 
+
+    //------------------------------------------------------
+  // UI
   //------------------------------------------------------
 
   @override
@@ -228,24 +537,20 @@ class _LearningPreferencesScreenState
     return Scaffold(
 
       appBar: AppBar(
-
         title: const Text(
           "Learning Preferences",
         ),
-
       ),
 
       body: loading
 
           ? const Center(
-              child:
-                  CircularProgressIndicator(),
+              child: CircularProgressIndicator(),
             )
 
           : SingleChildScrollView(
 
-              padding:
-                  const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(20),
 
               child: Column(
 
@@ -254,39 +559,23 @@ class _LearningPreferencesScreenState
 
                 children: [
 
-                  const Text(
+                  //--------------------------------------------------
+                  // Language
+                  //--------------------------------------------------
 
-                    "Learning Language",
+                  LanguageDropdown(
 
-                    style: TextStyle(
+                    languages: languages,
 
-                      fontWeight: FontWeight.bold,
+                    selectedId:
+                        selectedLanguageId,
 
-                    ),
-
-                  ),
-
-                  DropdownButtonFormField(
-
-                    value: language,
-
-                    items: languages.map(
-
-                      (e) => DropdownMenuItem(
-
-                        value: e,
-
-                        child: Text(e),
-
-                      ),
-
-                    ).toList(),
-
-                    onChanged: (v) {
+                    onChanged: (value) {
 
                       setState(() {
 
-                        language = v!;
+                        selectedLanguageId =
+                            value;
 
                       });
 
@@ -294,41 +583,51 @@ class _LearningPreferencesScreenState
 
                   ),
 
-                  const SizedBox(height: 25),
+                  const SizedBox(height: 20),
 
-                  const Text(
+                  //--------------------------------------------------
+                  // Download Card
+                  //--------------------------------------------------
 
-                    "Learning Category",
+                  if (selectedLanguage != null)
 
-                    style: TextStyle(
+                    DownloadLanguageCard(
 
-                      fontWeight: FontWeight.bold,
+                      language:
+                          selectedLanguage!,
+
+                      onDownload: () {
+
+                          downloadLanguage(
+                          selectedLanguage!,
+                        );
+
+                      },
+                
+                      onDelete:
+                          deleteLanguage,
 
                     ),
 
-                  ),
+                  const SizedBox(height: 25),
 
-                  DropdownButtonFormField(
+                  //--------------------------------------------------
+                  // Category
+                  //--------------------------------------------------
 
-                    value: category,
+                  CategoryDropdown(
 
-                    items: categories.map(
+                    categories: categories,
 
-                      (e) => DropdownMenuItem(
+                    selectedId:
+                        selectedCategoryId,
 
-                        value: e,
-
-                        child: Text(e),
-
-                      ),
-
-                    ).toList(),
-
-                    onChanged: (v) {
+                    onChanged: (value) {
 
                       setState(() {
 
-                        category = v!;
+                        selectedCategoryId =
+                            value;
 
                       });
 
@@ -336,41 +635,25 @@ class _LearningPreferencesScreenState
 
                   ),
 
-                  const SizedBox(height: 25),
+                  const SizedBox(height: 20),
 
-                  const Text(
+                  //--------------------------------------------------
+                  // Difficulty
+                  //--------------------------------------------------
 
-                    "Difficulty",
+                  DifficultyDropdown(
 
-                    style: TextStyle(
+                    levels: levels,
 
-                      fontWeight: FontWeight.bold,
+                    selectedId:
+                        selectedDifficultyId,
 
-                    ),
-
-                  ),
-
-                  DropdownButtonFormField(
-
-                    value: level,
-
-                    items: levels.map(
-
-                      (e) => DropdownMenuItem(
-
-                        value: e,
-
-                        child: Text(e),
-
-                      ),
-
-                    ).toList(),
-
-                    onChanged: (v) {
+                    onChanged: (value) {
 
                       setState(() {
 
-                        level = v!;
+                        selectedDifficultyId =
+                            value;
 
                       });
 
@@ -378,41 +661,56 @@ class _LearningPreferencesScreenState
 
                   ),
 
-                  const SizedBox(height: 25),
+                  const SizedBox(height: 20),
 
-                  const Text(
+                  //--------------------------------------------------
+                  // Words Per Session
+                  //--------------------------------------------------
 
-                    "Words Per Session",
-
-                    style: TextStyle(
-
-                      fontWeight: FontWeight.bold,
-
-                    ),
-
-                  ),
-
-                  DropdownButtonFormField(
+                  DropdownButtonFormField<int>(
 
                     value: wordsPerSession,
 
-                    items: sessionWords.map(
+                    decoration:
+                        const InputDecoration(
 
-                      (e) => DropdownMenuItem(
+                      labelText:
+                          "Words Per Session",
 
-                        value: e,
+                      prefixIcon:
+                          Icon(Icons.menu_book),
 
-                        child: Text("$e Words"),
+                      border:
+                          OutlineInputBorder(),
 
-                      ),
+                    ),
+
+                    items: sessionList.map(
+
+                      (item) {
+
+                        return DropdownMenuItem<int>(
+
+                          value: item,
+
+                          child: Text(
+                            "$item Words",
+                          ),
+
+                        );
+
+                      },
 
                     ).toList(),
 
-                    onChanged: (v) {
+                    onChanged: (value) {
+
+                      if (value == null) return;
 
                       setState(() {
 
-                        wordsPerSession = v!;
+                        wordsPerSession =
+                            value;
 
                       });
 
@@ -422,32 +720,57 @@ class _LearningPreferencesScreenState
 
                   const SizedBox(height: 40),
 
+                  //--------------------------------------------------
+                  // Save Button
+                  //--------------------------------------------------
+
                   SizedBox(
 
                     width: double.infinity,
 
-                    height: 50,
+                    height: 55,
 
-                    child: ElevatedButton(
+                    child: ElevatedButton.icon(
 
                       onPressed:
                           saving
                               ? null
                               : savePreference,
 
-                      child: saving
+                      icon: saving
 
-                          ? const CircularProgressIndicator()
+                          ? const SizedBox(
 
-                          : const Text(
+                              width: 20,
 
-                              "SAVE PREFERENCES",
+                              height: 20,
 
+                              child:
+                                  CircularProgressIndicator(
+                                strokeWidth: 2,
+                              ),
+
+                            )
+
+                          : const Icon(
+                              Icons.save,
                             ),
+
+                      label: Text(
+
+                        saving
+
+                            ? "Saving..."
+
+                            : "SAVE PREFERENCES",
+
+                      ),
 
                     ),
 
                   ),
+
+                  const SizedBox(height: 30),
 
                 ],
 
@@ -458,5 +781,6 @@ class _LearningPreferencesScreenState
     );
 
   }
+
 
 }

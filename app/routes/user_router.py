@@ -53,6 +53,7 @@ def get_profile(
 ):
 
     return UserProfileResponse(
+
         id=current_user.id,
 
         name=current_user.name,
@@ -61,11 +62,17 @@ def get_profile(
 
         avatar=current_user.avatar_url or "",
 
-        learning_language=current_user.learning_language,
+        learning_language_id=current_user.learning_language_id,
 
-        learning_category=current_user.learning_category,
+        learning_language=current_user.language.name,
 
-        learning_level=current_user.learning_level,
+        learning_category_id=current_user.learning_category_id,
+
+        learning_category=current_user.category.name,
+
+        difficulty_level_id=current_user.difficulty_level_id,
+
+        learning_level=current_user.difficulty.level,
 
         words_per_session=current_user.words_per_session,
 
@@ -238,15 +245,15 @@ def update_learning_preferences(
 ):
 
     current_user.learning_language = (
-        request.learning_language
+        request.learning_language_id
     )
 
     current_user.learning_category = (
-        request.learning_category
+        request.learning_category_id
     )
 
-    current_user.learning_level = (
-        request.learning_level
+    current_user.difficulty_level_id = (
+        request.difficulty_level_id
     )
 
     current_user.words_per_session = (
@@ -261,23 +268,7 @@ def update_learning_preferences(
 
         "success": True,
 
-        "message": "Learning preferences updated successfully",
-
-        "data": {
-
-            "learning_language":
-                current_user.learning_language,
-
-            "learning_category":
-                current_user.learning_category,
-
-            "learning_level":
-                current_user.learning_level,
-
-            "words_per_session":
-                current_user.words_per_session,
-
-        }
+        "message": "Preferences updated successfully"
 
     }
     
@@ -288,9 +279,7 @@ def update_learning_preferences(
 @router.get("/preferences")
 def get_learning_preferences(
 
-    current_user: User = Depends(
-        get_current_user
-    ),
+    current_user: User = Depends(get_current_user),
 
 ):
 
@@ -300,14 +289,14 @@ def get_learning_preferences(
 
         "data": {
 
-            "learning_language":
-                current_user.learning_language,
+            "learning_language_id":
+                current_user.learning_language_id,
 
-            "learning_category":
-                current_user.learning_category,
+            "learning_category_id":
+                current_user.learning_category_id,
 
-            "learning_level":
-                current_user.learning_level,
+            "difficulty_level_id":
+                current_user.difficulty_level_id,
 
             "words_per_session":
                 current_user.words_per_session,
