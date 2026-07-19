@@ -4,7 +4,8 @@ import '../models/word.dart';
 import '../models/user_model.dart';
 import '../services/auth_service.dart';
 import '../services/api_service.dart';
-
+import '../models/dashboard_model.dart';
+import '../services/download_service.dart';
 import '../widgets/dashboard_header.dart';
 import '../widgets/banner_card.dart';
 import '../widgets/stat_card.dart';
@@ -27,12 +28,17 @@ class _HomeScreenState extends State<HomeScreen> {
 
   bool loadingProfile = true;
 
+  DashboardModel? dashboard;
+
+  bool loadingDashboard = true;
+
   @override
   void initState() {
     super.initState();
 
     loadProfile();
     loadWord();
+    loadDashboard();
   }
 
   @override
@@ -93,6 +99,43 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  Future<void> loadDashboard() async {
+  if (user == null) return;
+
+    dashboard = await DownloadService.getDashboard(
+      userId: user!.id,
+      languageId: user!.learningLanguageId,
+    );
+
+    if (!mounted) return;
+
+    setState(() {
+      loadingDashboard = false;
+    });
+  }
+  
+
+  Widget buildRow(
+  String title,
+  String value,
+) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 8),
+    child: Row(
+      mainAxisAlignment:
+          MainAxisAlignment.spaceBetween,
+      children: [
+        Text(title),
+        Text(
+          value,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
+    ),
+  );
+}
   @override
   Widget build(BuildContext context) {
     if (loading) {
@@ -116,21 +159,132 @@ class _HomeScreenState extends State<HomeScreen> {
 
           const SectionTitle(title: "Today's Progress"),
 
-          const Row(
-            children: [
-              StatCard(icon: Icons.menu_book, value: "258", title: "Words"),
+          Row(
 
-              StatCard(icon: Icons.school, value: "92%", title: "Accuracy"),
+  children: [
 
-              StatCard(
-                icon: Icons.local_fire_department,
+    StatCard(
 
-                value: "15",
+      icon: Icons.menu_book,
 
-                title: "Streak",
-              ),
-            ],
-          ),
+      value: (dashboard?.wordsLearned ?? 0).toString(),
+
+      title: "Words",
+
+    ),
+
+    StatCard(
+
+      icon: Icons.school,
+
+      value: "${dashboard?.accuracy ?? 0}%",
+
+
+      title: "Accuracy",
+
+    ),
+
+    StatCard(
+
+      icon:
+          Icons.local_fire_department,
+
+      value: (dashboard?.streak ?? 0).toString(),
+
+      title: "Streak",
+
+    ),
+
+    StatCard(
+
+      icon:
+          Icons.local_fire_department,
+
+      value: "${dashboard?.bestScore ?? 0}/10",
+
+      title: "Streak",
+
+    ),
+
+    StatCard(
+
+      icon:
+          Icons.local_fire_department,
+
+      value: "${dashboard?.lastScore ?? 0}/10",
+
+      title: "Streak",
+
+    ),
+
+    StatCard(
+
+      icon:
+          Icons.local_fire_department,
+
+      value: (dashboard?.testsTaken ?? 0).toString(),
+
+      title: "Streak",
+
+    ),
+
+  ],
+
+),
+
+const SizedBox(height: 25),
+
+const SectionTitle(
+  title: "Practice Summary",
+),
+
+Card(
+
+  child: Padding(
+
+    padding:
+        const EdgeInsets.all(18),
+
+    child: Column(
+
+      children: [
+
+        buildRow(
+
+          "Best Score",
+
+          "${dashboard?.bestScore ?? 0}/10",
+
+        ),
+
+        const Divider(),
+
+        buildRow(
+
+          "Last Score",
+
+          "${dashboard?.lastScore ?? 0}/10",
+
+        ),
+
+        const Divider(),
+
+        buildRow(
+
+          "Tests Taken",
+
+          (dashboard?.testsTaken ?? 0)
+              .toString(),
+
+        ),
+
+      ],
+
+    ),
+
+  ),
+
+),
 
           const SizedBox(height: 30),
 

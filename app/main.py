@@ -17,6 +17,9 @@ from app.routes.master_router import router as master_router
 
 from app.routes import vocabulary_router
 
+from app.routes.practice_router import router as practice_router
+from app.routes.dashboard_router import router as dashboard_router
+
 from app.routes.download_router import (
     router as download_router,
 )
@@ -52,6 +55,10 @@ app.include_router(download_router)
 app.include_router(download_status_router)
 app.include_router(
     vocabulary_router.router
+)
+app.include_router(practice_router)
+app.include_router(
+    dashboard_router,
 )
 
 @app.get("/")

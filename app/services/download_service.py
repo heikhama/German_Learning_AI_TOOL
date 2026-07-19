@@ -117,7 +117,6 @@ class DownloadService:
             if existing >= word_count:
 
                 language.downloaded = True
-
                 db.commit()
 
                 DownloadJobService.complete_job(

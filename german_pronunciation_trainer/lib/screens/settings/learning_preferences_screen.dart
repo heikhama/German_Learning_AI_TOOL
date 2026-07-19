@@ -63,7 +63,7 @@ class _LearningPreferencesScreenState extends State<LearningPreferencesScreen> {
 
   int wordsPerSession = 20;
 
-  final List<int> sessionList = [5, 10, 20, 30, 50, 100];
+  final List<int> sessionList = [5, 10, 20, 30, 50, 100,10000];
 
   //------------------------------------------------------
 
@@ -304,6 +304,7 @@ class _LearningPreferencesScreenState extends State<LearningPreferencesScreen> {
 
     await controller.start(
       languageId: selectedLanguageId!,
+      wordCount: wordsPerSession,
 
       //--------------------------------------------------
       // Progress Update

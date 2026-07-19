@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart'
     as http;
 
-import '../models/user_profile.dart';
+import '../models/user_model.dart';
 
 import 'auth_service.dart';
 
@@ -11,8 +11,7 @@ import 'api_service.dart';
 
 class ProfileService {
 
-  static Future<UserProfile>
-      getProfile() async {
+  static Future<UserModel> getProfile() async {
 
     final token =
         await AuthService.getToken();
@@ -34,7 +33,7 @@ class ProfileService {
     final json =
         jsonDecode(response.body);
 
-    return UserProfile.fromJson(json);
+    return UserModel.fromJson(json);
 
   }
 

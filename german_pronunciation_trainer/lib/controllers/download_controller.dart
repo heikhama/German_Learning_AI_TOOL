@@ -15,6 +15,8 @@ class DownloadController {
 
     required int languageId,
 
+    required int wordCount,
+
     required Function(DownloadProgress) onProgress,
 
     required Function() onCompleted,
@@ -25,6 +27,7 @@ class DownloadController {
 
     final jobId = await DownloadService.startDownload(
       languageId,
+      wordCount,
     );
 
     if (jobId == null) {

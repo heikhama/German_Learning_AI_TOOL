@@ -169,42 +169,59 @@ class DownloadLanguageCard extends StatelessWidget {
             //--------------------------------------------------
 
             SizedBox(
-
+              
               width: double.infinity,
-
+  
               height: 45,
-
-              child: language.downloaded
-
-                  ? OutlinedButton.icon(
-
-                      onPressed: onDelete,
-
-                      icon: const Icon(
-                        Icons.delete,
-                      ),
-
-                      label: const Text(
-                        "Remove",
-                      ),
-
-                    )
-
-                  : ElevatedButton.icon(
-
-                      onPressed: onDownload,
-
-                      icon: const Icon(
-                        Icons.download,
-                      ),
-
-                      label: const Text(
-                        "Download Language",
-                      ),
-
-                    ),
-
+              
+              child: ElevatedButton.icon(
+              
+              onPressed: onDownload,
+    
+              icon: const Icon(Icons.download),
+    
+              label: const Text("Download Language"),
+              
+              ),
+            
             ),
+            // SizedBox(
+
+            //   width: double.infinity,
+
+            //   height: 45,
+
+            //   child: language.downloaded
+
+            //       ? OutlinedButton.icon(
+
+            //           onPressed: onDelete,
+
+            //           icon: const Icon(
+            //             Icons.delete,
+            //           ),
+
+            //           label: const Text(
+            //             "Remove",
+            //           ),
+
+            //         )
+
+            //       : ElevatedButton.icon(
+
+            //           onPressed: onDownload,
+
+            //           icon: const Icon(
+            //             Icons.download,
+            //           ),
+
+            //           label: const Text(
+            //             "Download Language",
+            //           ),
+
+            //         ),
+
+            // ),
 
           ],
 

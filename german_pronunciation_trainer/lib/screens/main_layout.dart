@@ -4,6 +4,7 @@ import '../models/app_page.dart';
 import '../models/user_model.dart';
 import '../services/auth_service.dart';
 import '../services/api_service.dart';
+import '../models/dashboard_model.dart';
 
 import 'home_screen.dart';
 import 'vocabulary_screen.dart';
@@ -226,7 +227,16 @@ class _MainLayoutState extends State<MainLayout> {
       case AppPage.vocabulary:
         return const VocabularyScreen();
       case AppPage.practice:
-        return const PracticeScreen();
+          if (loadingProfile || user == null) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+          }
+
+          return PracticeScreen(
+          userId: user!.id,
+          languageId: user!.learningLanguageId,
+        );
       case AppPage.progress:
         return const ProgressScreen();
       case AppPage.profile:

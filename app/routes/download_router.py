@@ -106,13 +106,14 @@ def download_language(
     )
 
     background_tasks.add_task(
-
+        
         run_download,
-
+        
         language.id,
-
+        
+        word_count,
+        
         job.id,
-
     )
 
     return {

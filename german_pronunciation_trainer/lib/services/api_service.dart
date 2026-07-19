@@ -309,6 +309,7 @@ static Future<Map<String, dynamic>> getDifficultyLevels() async {
 static Future<Map<String,dynamic>> downloadLanguage({
 
   required int languageId,
+  required int wordCount,
 
 }) async {
 
@@ -316,7 +317,7 @@ static Future<Map<String,dynamic>> downloadLanguage({
 
     Uri.parse(
 
-      "$baseUrl/language/download/$languageId",
+      "$baseUrl/language/download/$languageId?word_count=$wordCount",
 
     ),
 

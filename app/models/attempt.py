@@ -1,8 +1,10 @@
-from sqlalchemy import Float
-from sqlalchemy import String
+from datetime import datetime
 
-from sqlalchemy.orm import Mapped
-from sqlalchemy.orm import mapped_column
+from sqlalchemy import Boolean
+from sqlalchemy import Column
+from sqlalchemy import DateTime
+from sqlalchemy import ForeignKey
+from sqlalchemy import Integer
 
 from app.database.base import Base
 
@@ -11,14 +13,41 @@ class Attempt(Base):
 
     __tablename__ = "attempts"
 
-    id: Mapped[int] = mapped_column(
-        primary_key=True
+    id = Column(
+        Integer,
+        primary_key=True,
+        index=True,
     )
 
-    score: Mapped[float] = mapped_column(
-        Float
+    user_id = Column(
+        Integer,
+        ForeignKey("users.id"),
+        nullable=False,
     )
 
-    transcript: Mapped[str] = mapped_column(
-        String
+    vocabulary_id = Column(
+        Integer,
+        ForeignKey("vocabulary.id"),
+        nullable=False,
+    )
+
+    practice_result_id = Column(
+        Integer,
+        ForeignKey("practice_results.id"),
+        nullable=False,
+    )
+
+    is_correct = Column(
+        Boolean,
+        nullable=False,
+    )
+
+    response_time = Column(
+        Integer,
+        nullable=True,
+    )
+
+    created_at = Column(
+        DateTime,
+        default=datetime.utcnow,
     )
