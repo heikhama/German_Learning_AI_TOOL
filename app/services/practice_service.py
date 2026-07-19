@@ -70,32 +70,42 @@ class PracticeService:
     @staticmethod
     def submit_result(
         db,
-        user_id: int,
-        language_id: int,
-        score: int,
-        total_questions: int,
-        time_taken: int
-    ):
+        user_id,
+        language_id,
+        score,
+        total_questions,
+        time_taken,
+        ):
+        print("===== SUBMIT RESULT =====")
+        print(user_id, language_id, score, total_questions, time_taken)
 
-        percentage = int((score / total_questions) * 100)
+        try:
+            percentage = int((score / total_questions) * 100)
 
-        result = PracticeResult(
-            user_id=user_id,
-            language_id=language_id,
-            score=score,
-            total_questions=total_questions,
-            percentage=percentage,
-            time_taken=time_taken
-        )
+            result = PracticeResult(
+                user_id=user_id,
+                language_id=language_id,
+                score=score,
+                total_questions=total_questions,
+                percentage=percentage,
+                time_taken=time_taken,
+            )
 
-        db.add(result)
-        db.commit()
-        db.refresh(result)
+            db.add(result)
+            db.commit()
+            db.refresh(result)
 
-        return {
-            "success": True,
-            "message": "Practice result saved."
-        }
+            print("Saved ID:", result.id)
+
+            return {
+                "success": True,
+                "message": "Practice result saved."
+            }
+
+        except Exception as e:
+            db.rollback()
+            print("DATABASE ERROR:", str(e))
+            raise
         
     @staticmethod
     def dashboard(

@@ -10,31 +10,6 @@ class PracticeService {
 
   static const baseUrl = "http://127.0.0.1:8000";
 
-  // static Future<void> submitResult({
-  //   required int languageId,
-  //   required int score,
-  //   required int totalQuestions,
-  //   required int timeTaken,
-  // }) async {
-
-  //   final response = await http.post(
-  //     Uri.parse("$baseUrl/practice/submit"),
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //     body: jsonEncode({
-  //       "language_id": languageId,
-  //       "score": score,
-  //       "total_questions": totalQuestions,
-  //       "time_taken": timeTaken,
-  //     }),
-  //   );
-
-  //   if (response.statusCode != 200) {
-  //     throw Exception("Failed to submit result");
-  //   }
-  // }
-
   static Future<void> submitPractice({
   required int userId,
   required int languageId,

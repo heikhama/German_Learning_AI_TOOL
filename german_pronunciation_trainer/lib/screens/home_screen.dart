@@ -38,7 +38,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     loadProfile();
     loadWord();
-    loadDashboard();
+    // loadDashboard();
   }
 
   @override
@@ -88,6 +88,10 @@ class _HomeScreenState extends State<HomeScreen> {
         user = profile;
         loadingProfile = false;
       });
+
+    // Load dashboard AFTER profile is available
+      await loadDashboard();
+
     } catch (e) {
       debugPrint(e.toString());
 
@@ -100,18 +104,33 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> loadDashboard() async {
-  if (user == null) return;
+    if (user == null) return;
 
-    dashboard = await DownloadService.getDashboard(
-      userId: user!.id,
-      languageId: user!.learningLanguageId,
-    );
+    try {
+      dashboard = await DownloadService.getDashboard(
+        userId: user!.id,
+        languageId: user!.learningLanguageId,
+      );
 
-    if (!mounted) return;
+      if (!mounted) return;
 
-    setState(() {
-      loadingDashboard = false;
-    });
+      setState(() {
+        loadingDashboard = false;
+      });
+
+    } catch (e) {
+      print(e);
+
+      if (!mounted) return;
+
+      setState(() {
+        loadingDashboard = false;
+      });
+    }
+    print("Dashboard Loaded");
+    print(dashboard?.bestScore);
+    print(dashboard?.lastScore);
+    print(dashboard?.testsTaken);
   }
   
 
@@ -195,38 +214,38 @@ class _HomeScreenState extends State<HomeScreen> {
 
     ),
 
-    StatCard(
+    // StatCard(
 
-      icon:
-          Icons.local_fire_department,
+    //   icon:
+    //       Icons.local_fire_department,
 
-      value: "${dashboard?.bestScore ?? 0}/10",
+    //   value: "${dashboard?.bestScore ?? 0}/10",
 
-      title: "Streak",
+    //   title: "Streak",
 
-    ),
+    // ),
 
-    StatCard(
+    // StatCard(
 
-      icon:
-          Icons.local_fire_department,
+    //   icon:
+    //       Icons.local_fire_department,
 
-      value: "${dashboard?.lastScore ?? 0}/10",
+    //   value: "${dashboard?.lastScore ?? 0}/10",
 
-      title: "Streak",
+    //   title: "Streak",
 
-    ),
+    // ),
 
-    StatCard(
+    // StatCard(
 
-      icon:
-          Icons.local_fire_department,
+    //   icon:
+    //       Icons.local_fire_department,
 
-      value: (dashboard?.testsTaken ?? 0).toString(),
+    //   value: (dashboard?.testsTaken ?? 0).toString(),
 
-      title: "Streak",
+    //   title: "Streak",
 
-    ),
+    // ),
 
   ],
 

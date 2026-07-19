@@ -28,7 +28,7 @@ def submit_result(
     db: Session = Depends(get_db)
 ):
 
-    return PracticeService.PracticeSubmit(
+    return PracticeService.submit_result(
 
         db=db,
 
